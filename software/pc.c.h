@@ -39,14 +39,18 @@ void PC_Player (int I) {
     Serial.print(PT_Behind() == I ? 1 : 0);   // 1=atras | 0=ok
     Serial.print(F(";"));
 
-    int n, min_, max_;
-    n = PT_Bests(G.bests[I][0], &min_, &max_);
+    int n, avg, min_, max_;
+    n = PT_Bests(G.bests[I][0], &avg, &min_, &max_);
     Serial.print(n);                  // total de revezes
+    Serial.print(F(";"));
+    Serial.print(avg);                // media de revez
     Serial.print(F(";"));
     Serial.print(max_);               // maxima de revez
     Serial.print(F(";"));
-    n = PT_Bests(G.bests[I][1], &min_, &max_);
+    n = PT_Bests(G.bests[I][1], &avg, &min_, &max_);
     Serial.print(n);                  // total normais
+    Serial.print(F(";"));
+    Serial.print(avg);                // media normal
     Serial.print(F(";"));
     Serial.print(max_);               // maxima normal
     Serial.print(F(";"));

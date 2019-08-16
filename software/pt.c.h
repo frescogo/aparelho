@@ -1,12 +1,18 @@
-int PT_Bests (s8* bests, int* min_, int* max_) {
+int PT_Bests (s8* bests, int* avg, int* min_, int* max_) {
     *min_ = bests[HITS_BESTS-1];
     *max_ = bests[0];
+    int sum = 0;
+    int ret = HITS_BESTS;
     for (int i=0; i<HITS_BESTS; i++) {
-        if (bests[i] == 0) {
-            return i;
+        s8 v = bests[i];
+        if (v == 0) {
+            ret = i;
+            break;
         }
+        sum += v;
     }
-    return HITS_BESTS;
+    *avg = sum/HITS_BESTS;
+    return ret;
 }
 
 void PT_Bests_Apply (void) {
