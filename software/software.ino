@@ -338,7 +338,7 @@ void loop (void)
                 delay(310);
                 EEPROM_Save();
                 PT_All();
-                MODE(Serial_Score(), PC_Nop());
+                MODE(Serial_Score(), PC_Seq());
 
 /* No TIMEOUT outside playing: prevents falls miscount.
             } else if (got == IN_TIMEOUT) {
