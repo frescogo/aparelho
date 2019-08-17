@@ -36,9 +36,7 @@ typedef unsigned long u32;
 #define PIN_CFG   2
 #endif
 
-#ifdef ARDUINO_AVR_NANO
 #define PIN_TONE 11
-#endif
 
 static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 
