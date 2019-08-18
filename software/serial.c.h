@@ -219,7 +219,7 @@ void Serial_Log (void) {
     Serial.println(F(" pts"));
 }
 
-int Serial_Check (void) {
+int Serial_Check (int show_score) {
     static char CMD[32];
     static int  i = 0;
 
@@ -311,7 +311,9 @@ OK:;
     }
     EEPROM_Save();
     PT_All();
-    Serial_Score();
+    if (show_score) {
+        Serial_Score();
+    }
 
     return IN_NONE;
 }
