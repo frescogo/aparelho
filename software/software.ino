@@ -163,7 +163,7 @@ int Await_Input (bool serial) {
     static int pressed = 0;
     while (1) {
         if (serial) {
-            int ret = Serial_Check(S.modo==MODE_CEL);
+            int ret = Serial_Check();
             if (ret != IN_NONE) {
                 return ret;
             }
