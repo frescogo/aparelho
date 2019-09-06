@@ -56,7 +56,7 @@ void Serial_Score (void) {
             Serial.print(F(" [ "));
             for (int k=0; k<HITS_BESTS; k++) {
                 sum += G.bests[i][j][k];
-                sprintf_P(STR, PSTR("%3d "), (int)G.bests[i][j][k]);
+                sprintf_P(STR, PSTR("%2d "), (int)G.bests[i][j][k]);
                 Serial.print(STR);
             }
             Serial.print(F("] => "));
@@ -74,16 +74,16 @@ void Serial_Score (void) {
     Serial.println();
 
     //sprintf_P(STR, PSTR("(CONF: v%d.%d / %dcm / %ds / max=%d / equ=%d / cont=%d / max=%d)"),
-    sprintf_P(STR, PSTR("(v%d%d%d/%dcm/%ds/max%d,%d/equ%d/cont%d/fim%d/sens%d)"),
+    sprintf_P(STR, PSTR("(v%d%d%d/%dcm/%ds/max(%d,%d,%d)/equ%d/cont%d/fim%d)"),
                 MAJOR, MINOR, REVISION,
                 S.distancia,
                 (int)(S.timeout/1000),
                 (int)S.maximas,
                 (int)S.maxima,
+                (int)S.reves,
                 (int)S.equilibrio,
                 (int)CONT_PCT,
-                (int)ABORT_FALLS,
-                (int)S.sensibilidade);
+                (int)ABORT_FALLS);
     Serial.println(STR);
 }
 
@@ -274,8 +274,11 @@ _COMPLETE:
         S.equilibrio = 0;
     } else if (strncmp_P(CMD, PSTR("maxima "), 7) == 0) {
         S.maxima = atoi(&CMD[7]);
-    } else if (strncmp_P(CMD, PSTR("sensibilidade "), 13) == 0) {
-        S.sensibilidade = min(SENS_MAX, atoi(&CMD[13]));
+    } else if (strncmp_P(CMD, PSTR("reves "), 5) == 0) {
+        S.reves = atoi(&CMD[13]);
+        if (S.reves != 0) {
+            S.reves = max(REVES_MIN, min(REVES_MAX, S.reves));
+        }
 /*
     } else if (strncmp_P(CMD, PSTR("continuidade "), 13) == 0) {
         S.continuidade = atoi(&CMD[13]);

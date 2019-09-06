@@ -62,7 +62,10 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 #define STATE_TIMEOUT   2
 
 #define NAME_MAX        20
-#define SENS_MAX        220
+
+#define REVES_OFF       0
+#define REVES_MIN       180
+#define REVES_MAX       220
 
 #define POT_BONUS       3
 #define POT_VEL         50
@@ -84,7 +87,7 @@ typedef struct {
     s8   maximas;               // = sim/nao
     s8   equilibrio;            // = sim/nao
     u8   maxima;                // = 85 kmh
-    u16  sensibilidade;         // = 180  (minimum time to hold for back)
+    u16  reves;                 // = 180  (tempo minimo de segurar para o back)
 
     u16  hit;
     s8   dts[HITS_MAX];         // cs (ms*10)
@@ -245,10 +248,10 @@ void EEPROM_Default (void) {
     strcpy(S.names[1], "Atleta DIR");
     S.distancia     = 750;
     S.timeout       = REF_TIMEOUT * ((u32)1000);
-    S.maximas       = 0;
+    S.maximas       = 1;
     S.equilibrio    = 1;
     S.maxima        = 85;
-    S.sensibilidade = SENS_MAX;
+    S.reves         = REVES_OFF;
 }
 
 void setup (void) {
@@ -468,20 +471,23 @@ void loop (void)
                 goto _TIMEOUT;
             }
 
-            // sleep inside hit to reach S.sensibilidade
+            // sleep inside hit to reach S.reves
             {
+                int sensibilidade = (S.reves == 0) ? REVES_MIN : S.reves;
                 u32 dt_ = millis() - t1;
-                if (S.sensibilidade > dt_) {
-                    delay(S.sensibilidade-dt_);
+                if (sensibilidade > dt_) {
+                    delay(sensibilidade-dt_);
                 }
+                bool is_back;
                 if (got == 0) {
-                    IS_BACK = (digitalRead(PIN_LEFT)  == LOW);
+                    is_back = (digitalRead(PIN_LEFT)  == LOW);
                 } else {
-                    IS_BACK = (digitalRead(PIN_RIGHT) == LOW);
+                    is_back = (digitalRead(PIN_RIGHT) == LOW);
                 }
+                IS_BACK = (is_back && S.reves!=0); // considera somente se o reves estiver habilitado
                 if (!al_now)
                 {
-                    if (IS_BACK) {
+                    if (is_back) {
                         tone(PIN_TONE, NOTE_C4, 30);
                     } else if (S.equilibrio) {
                         // desequilibrio
