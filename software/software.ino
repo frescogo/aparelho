@@ -1,5 +1,5 @@
 #define MAJOR    1
-#define MINOR    11
+#define MINOR    12
 #define REVISION 1
 
 //#define DEBUG
@@ -40,14 +40,14 @@ typedef unsigned long u32;
 
 static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 
-#define REF_TIMEOUT     180         // 3 mins
-#define REF_BESTS       7
-#define REF_CONT        30          // 3.0%
+#define REF_TIMEOUT     300         // 5 mins
+#define REF_BESTS       24
+#define REF_CONT        18          // 1.8%
 #define REF_ABORT       10          // 10s per fall
 
 #define HITS_MAX        600
-#define HITS_BESTS_MAX  20
-#define HITS_BESTS      (min(HITS_BESTS_MAX, (S.timeout*REF_BESTS/REF_TIMEOUT/1000)))
+#define HITS_BESTS_MAX  REF_BESTS
+#define HITS_BESTS      (max(1, min(HITS_BESTS_MAX, (S.timeout*REF_BESTS/REF_TIMEOUT/1000))))
 
 #define HIT_MIN_DT      235         // minimum time between two hits (125kmh)
 //#define HIT_KMH_MAX   125         // to fit in s8 (changed to u8, but lets keep 125)
