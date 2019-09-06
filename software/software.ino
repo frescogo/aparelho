@@ -299,8 +299,6 @@ void loop (void)
 // GO
         PT_All();
 
-        MODE(CEL_Nop(), PC_Seq());
-
         if (G.time >= S.timeout) {
             goto _TIMEOUT;          // if reset on ended game
         }
