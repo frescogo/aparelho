@@ -18,7 +18,7 @@ void Serial_Score (void) {
     Serial.print(F("Tempo ........ "));
     Serial.print(G.time);
     Serial.print(F("ms"));
-    Serial.print(F(" (-"));
+    Serial.print(F(" (faltam "));
     Serial.print(G.time > S.timeout ? 0 : (int)ceil((S.timeout-G.time)/(float)1000));
     Serial.println(F("s)"));
 
