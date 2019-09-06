@@ -39,40 +39,27 @@ void PC_Player (int I) {
     Serial.print(PT_Behind() == I ? 1 : 0);   // 1=atras | 0=ok
     Serial.print(F(";"));
 
-    int Rtot1,Ravg1, Rtot2,Ravg2, Rmin_, Rmax_;
-    int Ntot1,Navg1, Ntot2,Navg2, Nmin_, Nmax_;
-    PT_Bests(G.bests[I][0], &Rtot1,&Ravg1, &Rtot2,&Ravg2, &Rmin_, &Rmax_);
-    PT_Bests(G.bests[I][1], &Ntot1,&Navg1, &Ntot2,&Navg2, &Nmin_, &Nmax_);
-
-    int Rtot, Ntot, Ravg, Navg, Rmax, Nmax;
-    if (Ravg1 <= Navg1) {
-        Rtot = Rtot2;
-        Ravg = Ravg2;
-        Rmax = Rmax_;
-        Ntot = Ntot1;
-        Navg = Navg1;
-        Nmax = Nmax_;
+    Lado *reves, *normal;
+    if (G.lados[I][0].avg1 < G.lados[I][1].avg1) {
+        reves  = &G.lados[I][0];
+        normal = &G.lados[I][1];
     } else {
-        Rtot = Ntot2;
-        Ravg = Navg2;
-        Rmax = Nmax_;
-        Ntot = Rtot1;
-        Navg = Ravg1;
-        Nmax = Rmax_;
+        reves  = &G.lados[I][1];
+        normal = &G.lados[I][0];
     }
 
-    Serial.print(Rtot);               // total de revezes
+    Serial.print(reves->tot2);      // total de revezes
     Serial.print(F(";"));
-    Serial.print(Ravg);               // media de revez
+    Serial.print(reves->avg2);      // media de revez
     Serial.print(F(";"));
-    Serial.print(Rmax);               // maxima de revez
+    Serial.print(reves->max_);      // maxima de revez
     Serial.print(F(";"));
 
-    Serial.print(Ntot);               // total normais
+    Serial.print(normal->tot1);     // total normais
     Serial.print(F(";"));
-    Serial.print(Navg);               // media normal
+    Serial.print(normal->avg1);     // media normal
     Serial.print(F(";"));
-    Serial.print(Nmax);               // maxima normal
+    Serial.print(normal->max_);     // maxima normal
     Serial.print(F(";"));
 }
 

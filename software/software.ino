@@ -67,7 +67,7 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 #define REVES_MIN       180
 #define REVES_MAX       220
 
-#define POT_BONUS       3
+#define POT_BONUS       2
 #define POT_VEL         50
 
 #define CONT_PCT        (((u32)REF_TIMEOUT)*REF_CONT/(S.timeout/1000))
@@ -95,17 +95,28 @@ typedef struct {
 static Save S;
 
 typedef struct {
+    int tot1;   // total de golpes     considerando HITS_BESTS
+    int avg1;   // media de velocidade considerando HITS_BESTS
+    int min1;   // menor velocidade    considerando HITS_BESTS
+    int tot2;   // total de golpes     considerando HITS_BESTS/2
+    int avg2;   // media de velocidade considerando HITS_BESTS/2
+    int min2;   // menor velocidade    considerando HITS_BESTS/2
+    int max_;   // maior velocidade
+} Lado;
+
+typedef struct {
     // needed on EEPROM_Load
-    u8  kmhs[HITS_MAX];              // kmh (max 125km/h)
+    u8   kmhs[HITS_MAX];              // kmh (max 125km/h)
 
     // calculated when required
-    s8  bests[2][2][HITS_BESTS_MAX]; // kmh (max 125kmh/h)
-    u32 time;                        // ms (total time)
-    u32 ps[2];                       // sum(kmh*kmh)
-    u16 hits;
-    u8  servs;
-    s8  pace[2];                     // kmh/kmh2
-    u16 total;
+    s8   bests[2][2][HITS_BESTS_MAX]; // kmh (max 125kmh/h)
+    Lado lados[2][2];
+    u32  time;                        // ms (total time)
+    u32  ps[2];                       // sum(kmh*kmh)
+    u16  hits;
+    u8   servs;
+    s8   pace[2];                     // kmh/kmh2
+    u16  total;
 } Game;
 static Game G;
 
