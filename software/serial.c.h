@@ -275,7 +275,7 @@ _COMPLETE:
     } else if (strncmp_P(CMD, PSTR("maxima "), 7) == 0) {
         S.maxima = atoi(&CMD[7]);
     } else if (strncmp_P(CMD, PSTR("reves "), 5) == 0) {
-        S.reves = atoi(&CMD[13]);
+        S.reves = atoi(&CMD[5]);
         if (S.reves != 0) {
             S.reves = max(REVES_MIN, min(REVES_MAX, S.reves));
         }
