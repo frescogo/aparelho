@@ -16,6 +16,8 @@ void PC_Restart (void) {
     Serial.print(F(";"));
     Serial.print(S.names[1]);         // atleta a direita
     Serial.print(F(";"));
+    Serial.print(S.juiz);             // juiz
+    Serial.print(F(";"));
     Serial.println();
 }
 
@@ -29,6 +31,8 @@ void PC_Seq (void) {
     Serial.print(S.names[0]);         // atleta a esquerda
     Serial.print(F(";"));
     Serial.print(S.names[1]);         // atleta a direita
+    Serial.print(F(";"));
+    Serial.print(S.juiz);             // juiz
     Serial.print(F(";"));
     Serial.println();
 }
