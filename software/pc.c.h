@@ -89,12 +89,16 @@ void PC_Fall (void) {
     Serial.print(F(";"));
     Serial.print(Falls());            // total de quedas
     Serial.print(F(";"));
+    PC_Player(0);
+    PC_Player(1);
     Serial.println();
 }
 
 void PC_End (void) {
     Serial.print(PC_END);             // codigo de fim
     Serial.print(F(";"));
+    PC_Player(0);
+    PC_Player(1);
     Serial.println();
 }
 

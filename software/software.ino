@@ -537,6 +537,7 @@ _FALL:
 
         PT_All();
         MODE(CEL_Fall(), PC_Fall());
+        MODE(CEL_Nop(),  PC_Tick());
         EEPROM_Save();
 
         if (Falls() >= ABORT_FALLS) {
@@ -548,6 +549,7 @@ _TIMEOUT:
     STATE = STATE_TIMEOUT;
     tone(PIN_TONE, NOTE_C2, 2000);
     PT_All();
+    MODE(CEL_Nop(), PC_Tick());
     MODE(CEL_End(), PC_End());
     EEPROM_Save();
 
