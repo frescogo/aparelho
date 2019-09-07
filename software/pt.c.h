@@ -22,6 +22,16 @@ void PT_Bests_Lado (s8* bests, Lado* lado) {
     lado->avg2 = sum2/(HITS_BESTS/2);
 }
 
+void PT_Bests_Get (int i, Lado** reves, Lado** normal) {
+    if (G.lados[i][0].avg1 <= G.lados[i][1].avg1) {
+        *reves  = &G.lados[i][0];
+        *normal = &G.lados[i][1];
+    } else {
+        *reves  = &G.lados[i][1];
+        *normal = &G.lados[i][0];
+    }
+}
+
 void PT_Bests_All (void) {
     if (! S.maximas) {
         return;
@@ -34,15 +44,11 @@ void PT_Bests_All (void) {
             PT_Bests_Lado(G.bests[i][j], &G.lados[i][j]);
         }
 
-        // pega a maior avg1 e a menor avg2
-        int avg;
-        if (G.lados[i][0].avg1 < G.lados[i][1].avg1) {
-            avg = (G.lados[i][0].avg2 + G.lados[i][1].avg1*2) / 3;
-        } else {
-            avg = (G.lados[i][1].avg2 + G.lados[i][0].avg1*2) / 3;
-        }
+        Lado *reves, *normal;
+        PT_Bests_Get(i, &reves, &normal);
+        int avg = (reves->avg2 + 2*normal->avg1) / 3;
 
-        G.ps[i] += avg*avg * POT_BONUS;
+        G.ps[i] += avg*avg * POT_BONUS * 3*HITS_BESTS/2;
     }
 }
 

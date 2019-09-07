@@ -50,21 +50,22 @@ void Serial_Score (void) {
         Serial.print(STR);
         Serial.print(G.ps[i]/100);
         Serial.println(F(" pts"));
+
         for (int j=0; j<2; j++) {
-            int sum = 0;
-            Serial.print( (j==1) ? F(" dir ") : F(" esq ") );
+            int J = (G.lados[i][0].avg1 <= G.lados[i][1].avg1 ? j : 1-j);
+            Serial.print( (j==0) ? F(" rev ") : F(" nrm ") );
+
             Serial.print(F(" [ "));
             for (int k=0; k<HITS_BESTS; k++) {
-                sum += G.bests[i][j][k];
-                sprintf_P(STR, PSTR("%2d "), (int)G.bests[i][j][k]);
-                Serial.print(STR);
+                if (j==0 && k>=HITS_BESTS/2) {
+                    Serial.print(F("   "));
+                } else {
+                    sprintf_P(STR, PSTR("%2d "), (int)G.bests[i][J][k]);
+                    Serial.print(STR);
+                }
             }
             Serial.print(F("] => "));
-            if (HITS_BESTS == 0) {
-                Serial.print(F("--"));
-            } else {
-                Serial.print(sum/HITS_BESTS);
-            }
+            Serial.print( (j==0) ? G.lados[i][J].avg2 : G.lados[i][J].avg1 );
             Serial.println(F(" kmh"));
         }
     }
@@ -159,36 +160,30 @@ void Serial_Log (void) {
     }
     //Serial.println();
 
-    u32 bests[2][2] = { {0,0}, {0,0} };
-    if (S.maximas) {
-        for (int i=0; i<2; i++) {
-            for (int j=0; j<2; j++) {
-                int sum = 0;
-                for (int k=0; k<HITS_BESTS; k++) {
-                    s8 v = G.bests[i][j][k];
-                    if (!S.maximas) {
-                        v = POT_VEL;
-                    }
-                    sum += v;
-                }
-                int avg = sum / HITS_BESTS;
-                bests[i][j] = avg*avg * POT_BONUS * HITS_BESTS;
-            }
-        }
-    }
-
-    u32 p0 = ps[0] + bests[0][0] + bests[0][1];
-    u32 p1 = ps[1] + bests[1][0] + bests[1][1];
-
     Serial.println(F("-----------------------------------------------"));
     Serial.println();
 
-    Serial.println(F("    Atleta    Vol     Esq     Dir   Total"));
-    sprintf_P(STR, PSTR("%10s: %5ld + %5ld + %5ld = %5ld pts"),
-        S.names[0], ps[0]/100, bests[0][0]/100, bests[0][1]/100, p0/100);
+    u32 maxs[2] = { 0,0 };
+    if (S.maximas) {
+        for (int i=0; i<2; i++) {
+            Lado *reves, *normal;
+            PT_Bests_Get(i, &reves, &normal);
+            int avg = (reves->avg2 + 2*normal->avg1) / 3;
+            maxs[i] = avg*avg * POT_BONUS * 3*HITS_BESTS/2;
+        }
+    }
+
+    u32 p0 = ps[0] + maxs[0];
+    u32 p1 = ps[1] + maxs[1];
+    assert(p0 == G.ps[0]);
+    assert(p1 == G.ps[1]);
+
+    Serial.println(F("    Atleta    Vol     Maxs     Total"));
+    sprintf_P(STR, PSTR("%10s: %5ld + %5ld = %5ld pts"),
+        S.names[0], ps[0]/100, maxs[0]/100, p0/100);
     Serial.println(STR);
-    sprintf_P(STR, PSTR("%10s: %5ld + %5ld + %5ld = %5ld pts"),
-        S.names[1], ps[1]/100, bests[1][0]/100, bests[1][1]/100, p1/100);
+    sprintf_P(STR, PSTR("%10s: %5ld + %5ld = %5ld pts"),
+        S.names[1], ps[1]/100, maxs[1]/100, p1/100);
     Serial.println(STR);
 
     Serial.println();

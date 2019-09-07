@@ -40,13 +40,7 @@ void PC_Player (int I) {
     Serial.print(F(";"));
 
     Lado *reves, *normal;
-    if (G.lados[I][0].avg1 < G.lados[I][1].avg1) {
-        reves  = &G.lados[I][0];
-        normal = &G.lados[I][1];
-    } else {
-        reves  = &G.lados[I][1];
-        normal = &G.lados[I][0];
-    }
+    PT_Bests_Get(I, &reves, &normal);
 
     Serial.print(reves->tot2);      // total de revezes
     Serial.print(F(";"));
