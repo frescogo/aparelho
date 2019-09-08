@@ -61,7 +61,7 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 #define STATE_PLAYING   1
 #define STATE_TIMEOUT   2
 
-#define NAME_MAX        20
+#define NAME_MAX        15
 
 #define REVES_OFF       0
 #define REVES_MIN       180
@@ -75,7 +75,7 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 
 static int  STATE;
 static bool IS_BACK;
-static char STR[100];
+static char STR[64];
 
 typedef struct {
     u8   modo;                  // = MODE_CEL
