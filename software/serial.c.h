@@ -178,7 +178,7 @@ void Serial_Log (void) {
     assert(p0 == G.ps[0]);
     assert(p1 == G.ps[1]);
 
-    Serial.println(F("    Atleta    Vol     Maxs     Total"));
+    Serial.println(F("    Atleta    Vol    Maxs    Total"));
     sprintf_P(STR, PSTR("%10s: %5ld + %5ld = %5ld pts"),
         S.names[0], ps[0]/100, maxs[0]/100, p0/100);
     Serial.println(STR);
