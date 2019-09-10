@@ -65,7 +65,7 @@ void PC_Player (int I) {
     Serial.print(F(";"));
 }
 
-void PC_Hit (int player, int is_back, int kmh) {
+void PC_Hit (int player, bool is_back, int kmh) {
     Serial.print(PC_HIT);             // codigo de golpe
     Serial.print(F(";"));
     Serial.print(player);             // 0=esquerda | 1=direita

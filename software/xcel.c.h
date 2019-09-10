@@ -9,8 +9,11 @@ void CEL_Restart (void) {
     Serial_Score();
 }
 
-void CEL_Hit (u32 kmh, bool is_back) {
+void CEL_Hit (int player, bool is_back, int kmh) {
     Serial.print(F("> "));
+    if (player == 1) {
+        Serial.print(F("      "));
+    }
     Serial.print(kmh);
     if (is_back) {
         Serial.print(F(" !"));
