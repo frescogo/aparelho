@@ -46,7 +46,7 @@ void PT_Bests_All (void) {
 
         Lado *reves, *normal;
         PT_Bests_Get(i, &reves, &normal);
-        int avg = (reves->avg2 + 2*normal->avg1) / 3;
+        int avg = ((!S.reves ? 0 : reves->avg2) + 2*normal->avg1) / 3;
 
         G.ps[i] += avg*avg * POT_BONUS * 3*HITS_BESTS/2;
     }
@@ -101,7 +101,7 @@ void PT_All (void) {
                 pace[1] += kmh*kmh;
 
                 // bests
-                s8* vec = G.bests[ 1-(i%2) ][ dt>0 ];
+                s8* vec = G.bests[ 1-(i%2) ][ dt>0||!S.reves ];
                 for (int j=0; j<HITS_BESTS; j++) {
                     if (kmh > vec[j]) {
                         for (int k=HITS_BESTS-1; k>j; k--) {
@@ -109,6 +109,16 @@ void PT_All (void) {
                         }
                         vec[j] = kmh;
                         break;
+                    }
+                }
+                // marca os reves somente para exibicao
+                if (!S.reves && dt<0) {
+                    s8* vec = G.bests[ 1-(i%2) ][0];
+                    for (int j=0; j<HITS_BESTS; j++) {
+                        if (vec[j] == 0) {
+                            vec[j] = kmh;
+                            break;
+                        }
                     }
                 }
             }

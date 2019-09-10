@@ -46,12 +46,16 @@ void PC_Player (int I) {
     Lado *reves, *normal;
     PT_Bests_Get(I, &reves, &normal);
 
-    Serial.print(reves->tot2);      // total de revezes
-    Serial.print(F(";"));
-    Serial.print(reves->avg2);      // media de revez
-    Serial.print(F(";"));
-    Serial.print(reves->max_);      // maxima de revez
-    Serial.print(F(";"));
+    if (!S.reves) {
+        Serial.print(F("0;0;0;"));
+    } else {
+        Serial.print(reves->tot2);  // total de revezes
+        Serial.print(F(";"));
+        Serial.print(reves->avg2);  // media de revez
+        Serial.print(F(";"));
+        Serial.print(reves->max_);  // maxima de revez
+        Serial.print(F(";"));
+    }
 
     Serial.print(normal->tot1);     // total normais
     Serial.print(F(";"));

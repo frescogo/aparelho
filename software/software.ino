@@ -489,16 +489,14 @@ void loop (void)
                 if (sensibilidade > dt_) {
                     delay(sensibilidade-dt_);
                 }
-                bool is_back;
                 if (got == 0) {
-                    is_back = (digitalRead(PIN_LEFT)  == LOW);
+                    IS_BACK = (digitalRead(PIN_LEFT)  == LOW);
                 } else {
-                    is_back = (digitalRead(PIN_RIGHT) == LOW);
+                    IS_BACK = (digitalRead(PIN_RIGHT) == LOW);
                 }
-                IS_BACK = (is_back && S.reves!=0); // considera somente se o reves estiver habilitado
                 if (!al_now)
                 {
-                    if (is_back) {
+                    if (IS_BACK) {
                         tone(PIN_TONE, NOTE_C4, 30);
                     } else if (S.equilibrio) {
                         // desequilibrio
