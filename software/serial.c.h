@@ -11,34 +11,32 @@ void Serial_Score (void) {
     Serial.println(F("-----------------------------------------------"));
     Serial.println();
 
-    Serial.print(F("TOTAL ........ "));
+    Serial.print(F("TOTAL .............. "));
     Serial.print(G.total);
     Serial.println(F(" pts"));
 
-    Serial.print(F("Tempo ........ "));
-    Serial.print(G.time);
-    Serial.print(F("ms"));
-    Serial.print(F(" (faltam "));
-    Serial.print(G.time > S.timeout ? 0 : (int)ceil((S.timeout-G.time)/(float)1000));
-    Serial.println(F("s)"));
+    int restante = (G.time > S.timeout ? 0 : (int)ceil((S.timeout-G.time)/(float)1000));
+    sprintf_P(STR, PSTR("%02d:%02d "), restante/60, restante%60);
+    Serial.print(F("Tempo Restante ..... "));
+    Serial.println(STR);
 
-    Serial.print(F("Quedas ....... "));
+    Serial.print(F("Quedas ............. "));
     Serial.println(Falls());
 
-    Serial.print(F("Golpes ....... "));
+    Serial.print(F("Golpes ............. "));
     Serial.println(G.hits);
 
-    Serial.print(F("Ritmo ........ "));
+    Serial.print(F("Média .............. "));
     if (G.time > 5000) {
         Serial.print((int)G.pace[0]);
-        Serial.print(F("/"));
-        Serial.print((int)G.pace[1]);
-        Serial.println(F(" kmh"));
+        //Serial.print(F("/"));
+        //Serial.print((int)G.pace[1]);
+        Serial.println(F(" km/h"));
     } else {
         Serial.println(F("---"));
     }
 
-    Serial.print(F("Juiz ......... "));
+    Serial.print(F("Juiz ............... "));
     Serial.println(S.juiz);
 
     for (int i=0; i<2; i++) {
