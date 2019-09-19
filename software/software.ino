@@ -1,6 +1,6 @@
 #define MAJOR    1
 #define MINOR    12
-#define REVISION 1
+#define REVISION 2
 
 //#define DEBUG
 
@@ -394,7 +394,7 @@ void loop (void)
 
         IS_BACK = false;
 
-        MODE(CEL_Service(), PC_Hit(1-got,false,0));
+        MODE(CEL_Service(got), PC_Hit(1-got,false,0));
 
         PT_All();
         delay(HIT_MIN_DT);

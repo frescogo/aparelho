@@ -10,7 +10,7 @@ void CEL_Restart (void) {
 }
 
 void CEL_Hit (int player, bool is_back, int kmh) {
-    Serial.print(F("> "));
+    Serial.print(F("   "));
     if (player == 1) {
         Serial.print(F("      "));
     }
@@ -21,8 +21,14 @@ void CEL_Hit (int player, bool is_back, int kmh) {
     Serial.println();
 }
 
-void CEL_Service (void) {
-    Serial.println(F("> saque"));
+void CEL_Service (int player) {
+    Serial.println();
+    Serial.println(F("  ESQ    DIR"));
+    Serial.print(F("   "));
+    if (player == 1) {
+        Serial.print(F("      "));
+    }
+    Serial.println(F("**"));
 }
 
 void CEL_Fall (void) {
