@@ -99,13 +99,13 @@ typedef struct {
 static Save S;
 
 typedef struct {
-    int tot1;   // total de golpes     considerando HITS_BESTS
-    int avg1;   // media de velocidade considerando HITS_BESTS
-    int min1;   // menor velocidade    considerando HITS_BESTS
-    int tot2;   // total de golpes     considerando HITS_BESTS/2
-    int avg2;   // media de velocidade considerando HITS_BESTS/2
-    int min2;   // menor velocidade    considerando HITS_BESTS/2
+    u16 avg1;   // media de velocidade considerando HITS_BESTS (x100)
+    u16 avg2;   // media de velocidade considerando HITS_BESTS/2 (x100)
     int max_;   // maior velocidade
+    //int tot1;   // total de golpes     considerando HITS_BESTS
+    //int min1;   // menor velocidade    considerando HITS_BESTS
+    //int tot2;   // total de golpes     considerando HITS_BESTS/2
+    //int min2;   // menor velocidade    considerando HITS_BESTS/2
 } Lado;
 
 typedef struct {
@@ -114,13 +114,15 @@ typedef struct {
 
     // calculated when required
     s8   bests[2][2][HITS_BESTS_MAX]; // kmh (max 125kmh/h)
-    Lado lados[2][2];
     u32  time;                        // ms (total time)
-    u32  ps[2];                       // sum(kmh*kmh)
     u16  hits;
     u8   servs;
     s8   pace[2];                     // kmh/kmh2
+
     u16  total;
+    u16  ps[2];                       // volume+reves+normal (x100)
+    u16  volume[2];                   // avg2/avg2 (x100)
+    Lado lados[2][2];
 } Game;
 static Game G;
 

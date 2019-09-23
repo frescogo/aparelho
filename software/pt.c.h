@@ -1,16 +1,16 @@
 void PT_Bests_Lado (s8* bests, Lado* lado) {
-    lado->min1 = bests[HITS_BESTS-1];
-    lado->min2 = bests[HITS_BESTS/2-1];
+    //lado->min1 = bests[HITS_BESTS-1];
+    //lado->min2 = bests[HITS_BESTS/2-1];
     lado->max_ = bests[0];
     int sum1 = 0;
     int sum2 = 0;
-    lado->tot1 = HITS_BESTS;
-    lado->tot2 = HITS_BESTS/2;
+    //lado->tot1 = HITS_BESTS;
+    //lado->tot2 = HITS_BESTS/2;
     for (int i=0; i<HITS_BESTS; i++) {
         s8 v = bests[i];
         if (v == 0) {
-            lado->tot1 = i;
-            lado->tot2 = min(i, HITS_BESTS/2);
+            //lado->tot1 = i;
+            //lado->tot2 = min(i, HITS_BESTS/2);
             break;
         }
         sum1 += v;
@@ -78,9 +78,9 @@ void PT_All (void) {
 
     memset(G.bests, 0, 2*2*HITS_BESTS_MAX*sizeof(s8));
 
-    u32 pace_all[2] = {0,0};    // overall   avg, avg2
+    u32 pace[2] = {0,0};        // overall   avg, avg2
 
-    u32 pace_one[2] = {0,0};    // per-player avg2, avg2
+    u32 volume[2] = {0,0};      // per-player avg2, avg2
     u16 hits_one[2] = {0,0};    // per-player hits
 
     for (int i=0 ; i<S.hit ; i++) {
@@ -99,11 +99,11 @@ void PT_All (void) {
             else
             {
                 G.hits++;
-                pace_all[0] += kmh;
-                pace_all[1] += kmh*kmh;
+                pace[0] += kmh;
+                pace[1] += kmh*kmh;
 
                 int idx = (i%2);
-                pace_one[idx] = kmh*kmh;
+                volume[idx] = kmh*kmh;
                 hits_one[idx]++;
 
                 // bests
@@ -134,11 +134,14 @@ void PT_All (void) {
     }
     G.time *= 10;
 
-    G.pace[0] = pace_all[0]/G.hits;
-    G.pace[1] = pace_all[1]/G.hits;
+    G.pace[0] = pace[0]/G.hits;
+    G.pace[1] = pace[1]/G.hits;
 
-    G.ps[0] = (hits_one[0] == 0) ? 0 : pace_one[0] * MULT_VOLUME / hits_one[0];
-    G.ps[1] = (hits_one[1] == 0) ? 0 : pace_one[1] * MULT_VOLUME / hits_one[1];
+    G.volume[0] = volume[0]*100/hits_one[0];
+    G.volume[1] = volume[1]*100/hits_one[1];
+
+    G.ps[0] = (hits_one[0] == 0) ? 0 : G.volume[0] * MULT_VOLUME;
+    G.ps[1] = (hits_one[1] == 0) ? 0 : G.volume[1] * MULT_VOLUME;
     PT_Bests_All();
 
     u32 pct   = min(990, Falls()*CONT_PCT);
