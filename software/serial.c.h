@@ -83,11 +83,10 @@ void Serial_Score (void) {
     Serial.println();
 
     //sprintf_P(STR, PSTR("(CONF: v%d.%d / %dcm / %ds / max=%d / equ=%d / cont=%d / max=%d)"),
-    sprintf_P(STR, PSTR("(v%d%d%d/%dcm/%ds/max(%d,%d,%d)/equ%d/cont%d/fim%d)"),
+    sprintf_P(STR, PSTR("(v%d%d%d/%dcm/%ds/maxs(%d,%d)/equ%d/cont%d/fim%d)"),
                 MAJOR, MINOR, REVISION,
                 S.distancia,
                 (int)(S.timeout/1000),
-                (int)S.maximas,
                 (int)S.maxima,
                 (int)S.reves,
                 (int)S.equilibrio,
@@ -172,13 +171,11 @@ void Serial_Log (void) {
     Serial.println();
 
     u32 maxs[2] = { 0,0 };
-    if (S.maximas) {
-        for (int i=0; i<2; i++) {
-            Lado *reves, *normal;
-            PT_Bests_Get(i, &reves, &normal);
-            int avg = (reves->avg2 + 2*normal->avg1) / 3;
-            maxs[i] = avg*avg * POT_BONUS * 3*HITS_BESTS/2;
-        }
+    for (int i=0; i<2; i++) {
+        Lado *reves, *normal;
+        PT_Bests_Get(i, &reves, &normal);
+        int avg = (reves->avg2 + 2*normal->avg1) / 3;
+        maxs[i] = avg*avg * POT_BONUS * 3*HITS_BESTS/2;
     }
 
     u32 p0 = ps[0] + maxs[0];
@@ -267,10 +264,6 @@ _COMPLETE:
         S.timeout = ((u32)atoi(&CMD[6])) * 1000;
     } else if (strncmp_P(CMD, PSTR("distancia "), 5) == 0) {
         S.distancia = atoi(&CMD[10]);
-    } else if (strncmp_P(CMD, PSTR("maximas sim"), 11) == 0) {
-        S.maximas = 1;
-    } else if (strncmp_P(CMD, PSTR("maximas nao"), 11) == 0) {
-        S.maximas = 0;
     } else if (strncmp_P(CMD, PSTR("equilibrio sim"), 14) == 0) {
         S.equilibrio = 1;
     } else if (strncmp_P(CMD, PSTR("equilibrio nao"), 14) == 0) {

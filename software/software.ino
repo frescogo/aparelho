@@ -88,7 +88,6 @@ typedef struct {
     char names[2][NAME_MAX+1];  // = { "Atleta ESQ", "Atleta DIR" }
     u32  timeout;               // = 180 * ((u32)1000) ms
     u16  distancia;             // = 700 cm
-    s8   maximas;               // = sim/nao
     s8   equilibrio;            // = sim/nao
     u8   maxima;                // = 85 kmh
     u16  reves;                 // = 180  (tempo minimo de segurar para o back)
@@ -265,7 +264,6 @@ void EEPROM_Default (void) {
     strcpy(S.names[1], "Atleta DIR");
     S.distancia     = 750;
     S.timeout       = REF_TIMEOUT * ((u32)1000);
-    S.maximas       = 1;
     S.equilibrio    = 1;
     S.maxima        = 85;
     S.reves         = REVES_OFF;

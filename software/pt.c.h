@@ -33,10 +33,6 @@ void PT_Bests_Get (int i, Lado** reves, Lado** normal) {
 }
 
 void PT_Bests_All (void) {
-    if (! S.maximas) {
-        return;
-    }
-
     for (int i=0; i<2; i++)
     {
         // calcula para os dois lados HITS_BESTS e HITS_BESTS/2
