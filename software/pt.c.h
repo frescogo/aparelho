@@ -137,8 +137,8 @@ void PT_All (void) {
     G.pace[0] = pace_all[0]/G.hits;
     G.pace[1] = pace_all[1]/G.hits;
 
-    G.ps[0] = pace_one[0]/hits_one[0] * MULT_VOLUME;
-    G.ps[1] = pace_one[1]/hits_one[1] * MULT_VOLUME;
+    G.ps[0] = (hits_one[0] == 0) ? 0 : pace_one[0] * MULT_VOLUME / hits_one[0];
+    G.ps[1] = (hits_one[1] == 0) ? 0 : pace_one[1] * MULT_VOLUME / hits_one[1];
     PT_Bests_All();
 
     u32 pct   = min(990, Falls()*CONT_PCT);
