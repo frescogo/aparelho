@@ -44,10 +44,22 @@ void Serial_Score (void) {
         Serial.println(F("-----------------------------------------------"));
         Serial.println();
 
+        int vol = 0;
+        int rev,nrm;
+        if (G.lados[i][0].avg1 > G.lados[i][1].avg1) {
+            nrm = G.lados[i][0].avg1;
+            rev = G.lados[i][1].avg2;
+        } else {
+            nrm = G.lados[i][1].avg1;
+            rev = G.lados[i][0].avg2;
+        }
+
         sprintf_P(STR, PSTR("%10s: "), S.names[i]);
         Serial.print(STR);
         Serial.print(G.ps[i]/100);
-        Serial.println(F(" pts"));
+        Serial.print(F(" pts "));
+        sprintf_P(STR, PSTR("(%4d vol / %4d nrm / %4d rev)"), vol, nrm, rev);
+        Serial.println(STR);
 
         for (int j=0; j<2; j++) {
             int J = (G.lados[i][0].avg1 <= G.lados[i][1].avg1 ? j : 1-j);
@@ -62,9 +74,7 @@ void Serial_Score (void) {
                     Serial.print(STR);
                 }
             }
-            Serial.print(F("] => "));
-            Serial.print( (j==0) ? G.lados[i][J].avg2 : G.lados[i][J].avg1 );
-            Serial.println(F(" kmh"));
+            Serial.println(F("]"));
         }
     }
 

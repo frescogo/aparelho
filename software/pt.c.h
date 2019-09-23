@@ -18,8 +18,8 @@ void PT_Bests_Lado (s8* bests, Lado* lado) {
             sum2 += v;
         }
     }
-    lado->avg1 = sum1/HITS_BESTS;
-    lado->avg2 = sum2/(HITS_BESTS/2);
+    lado->avg1 = sum1*100/HITS_BESTS;
+    lado->avg2 = sum2*100/(HITS_BESTS/2);
 }
 
 void PT_Bests_Get (int i, Lado** reves, Lado** normal) {
@@ -46,9 +46,10 @@ void PT_Bests_All (void) {
 
         Lado *reves, *normal;
         PT_Bests_Get(i, &reves, &normal);
-        int avg = ((!S.reves ? 0 : reves->avg2) + 2*normal->avg1) / 3;
-
-        G.ps[i] += avg*avg * POT_BONUS * 3*HITS_BESTS/2;
+        if (S.reves) {
+            G.ps[i] += reves->avg2 * MULT_REVES;
+        }
+        G.ps[i] += normal->avg1 * MULT_NORMAL;
     }
 }
 
@@ -77,13 +78,15 @@ void PT_All (void) {
 
     memset(G.bests, 0, 2*2*HITS_BESTS_MAX*sizeof(s8));
 
-    u32 pace[2] = {0,0};
+    u32 pace_all[2] = {0,0};    // overall   avg, avg2
+
+    u32 pace_one[2] = {0,0};    // per-player avg2, avg2
+    u16 hits_one[2] = {0,0};    // per-player hits
 
     for (int i=0 ; i<S.hit ; i++) {
     //for (int i=0 ; i<600 ; i++) {
-        s8  dt  = S.dts[i];
-        s8  kmh = G.kmhs[i];
-        u16 pt  = ((u16)kmh)*((u16)kmh);
+        s8 dt  = S.dts[i];
+        s8 kmh = G.kmhs[i];
 
         if (dt == HIT_SERV) {
             G.servs++;
@@ -96,9 +99,12 @@ void PT_All (void) {
             else
             {
                 G.hits++;
-                G.ps[1-(i%2)] += pt;
-                pace[0] += kmh;
-                pace[1] += kmh*kmh;
+                pace_all[0] += kmh;
+                pace_all[1] += kmh*kmh;
+
+                int idx = (i%2);
+                pace_one[idx] = kmh*kmh;
+                hits_one[idx]++;
 
                 // bests
                 s8* vec = G.bests[ 1-(i%2) ][ dt>0||!S.reves ];
@@ -128,9 +134,11 @@ void PT_All (void) {
     }
     G.time *= 10;
 
-    G.pace[0] = pace[0]/G.hits;
-    G.pace[1] = sqrt(pace[1]/G.hits);
+    G.pace[0] = pace_all[0]/G.hits;
+    G.pace[1] = pace_all[1]/G.hits;
 
+    G.ps[0] = pace_one[0]/hits_one[0] * MULT_VOLUME;
+    G.ps[1] = pace_one[1]/hits_one[1] * MULT_VOLUME;
     PT_Bests_All();
 
     u32 pct   = min(990, Falls()*CONT_PCT);

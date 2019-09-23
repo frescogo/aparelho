@@ -1,6 +1,6 @@
-#define MAJOR    1
-#define MINOR    12
-#define REVISION 2
+#define MAJOR    2
+#define MINOR    0
+#define REVISION 0
 
 //#define DEBUG
 
@@ -72,6 +72,10 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 
 #define CONT_PCT        (((u32)REF_TIMEOUT)*REF_CONT/(S.timeout/1000))
 #define ABORT_FALLS     (S.timeout / REF_ABORT / 1000)
+
+#define MULT_VOLUME     7
+#define MULT_NORMAL     2
+#define MULT_REVES      1
 
 static int  STATE;
 static bool IS_BACK;
