@@ -12,6 +12,8 @@ void PC_Restart (void) {
     Serial.print(F(";"));
     Serial.print(S.timeout/1000);     // tempo total de jogo
     Serial.print(F(";"));
+    Serial.print(S.equilibrio);       // equilibrio ligado?
+    Serial.print(F(";"));
     Serial.print(S.names[0]);         // atleta a esquerda
     Serial.print(F(";"));
     Serial.print(S.names[1]);         // atleta a direita
