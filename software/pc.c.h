@@ -42,31 +42,26 @@ void PC_Seq (void) {
 void PC_Player (int I) {
     Serial.print(G.ps[I]/100);        // pontuacao
     Serial.print(F(";"));
-    Serial.print(G.volume[I]/100);    // volume
-    Serial.print(F(";"));
     Serial.print(PT_Behind() == I ? 1 : 0);   // 1=atras | 0=ok
     Serial.print(F(";"));
+    Serial.print(G.max_[I]);          // maior velocidade
+    Serial.print(F(";"));
 
-    Lado *reves, *normal;
-    PT_Bests_Get(I, &reves, &normal);
-
-    if (!S.reves) {
-        Serial.print(F("0;0;"));
-    } else {
-        //Serial.print(reves->tot2);  // total de revezes
-        //Serial.print(F(";"));
-        Serial.print(reves->avg2);  // media de revez
-        Serial.print(F(";"));
-        Serial.print(reves->max_);  // maxima de revez
-        Serial.print(F(";"));
-    }
+    Serial.print(G.volume[I]/100);    // volume
+    Serial.print(F(";"));
+    Serial.print(G.normal[I]);        // media normal
+    Serial.print(F(";"));
+    Serial.print(G.reves[I]);         // media de revez
+    Serial.print(F(";"));
 
     //Serial.print(normal->tot1);     // total normais
     //Serial.print(F(";"));
-    Serial.print(normal->avg1);     // media normal
-    Serial.print(F(";"));
-    Serial.print(normal->max_);     // maxima normal
-    Serial.print(F(";"));
+    //Serial.print(G.normal[I].max_);   // maxima normal
+    //Serial.print(F(";"));
+    //Serial.print(reves->tot2);  // total de revezes
+    //Serial.print(F(";"));
+    //Serial.print(G.reves[I].max_);    // maxima de revez
+    //Serial.print(F(";"));
 }
 
 void PC_Hit (int player, bool is_back, int kmh) {

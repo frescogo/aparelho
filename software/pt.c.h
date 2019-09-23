@@ -22,33 +22,6 @@ void PT_Bests_Lado (s8* bests, Lado* lado) {
     lado->avg2 = sum2*100/(HITS_BESTS/2);
 }
 
-void PT_Bests_Get (int i, Lado** reves, Lado** normal) {
-    if (G.lados[i][0].avg1 <= G.lados[i][1].avg1) {
-        *reves  = &G.lados[i][0];
-        *normal = &G.lados[i][1];
-    } else {
-        *reves  = &G.lados[i][1];
-        *normal = &G.lados[i][0];
-    }
-}
-
-void PT_Bests_All (void) {
-    for (int i=0; i<2; i++)
-    {
-        // calcula para os dois lados HITS_BESTS e HITS_BESTS/2
-        for (int j=0; j<2; j++) {
-            PT_Bests_Lado(G.bests[i][j], &G.lados[i][j]);
-        }
-
-        Lado *reves, *normal;
-        PT_Bests_Get(i, &reves, &normal);
-        if (S.reves) {
-            G.ps[i] += reves->avg2 * MULT_REVES;
-        }
-        G.ps[i] += normal->avg1 * MULT_NORMAL;
-    }
-}
-
 int PT_Behind (void) {
     u32 p0  = G.ps[0];
     u32 p1  = G.ps[1];
@@ -66,8 +39,6 @@ int PT_Behind (void) {
 }
 
 void PT_All (void) {
-    G.ps[0] = 0;
-    G.ps[1] = 0;
     G.time  = 0;
     G.hits  = 0;
     G.servs = 0;
@@ -133,12 +104,33 @@ void PT_All (void) {
     G.pace[0] = pace[0]/G.hits;
     G.pace[1] = pace[1]/G.hits;
 
-    G.volume[0] = volume[0]*100/hits_one[0];
-    G.volume[1] = volume[1]*100/hits_one[1];
+    G.volume[0] = (hits_one[0] == 0) ? 0 : volume[0]*100/hits_one[0];
+    G.volume[1] = (hits_one[1] == 0) ? 0 : volume[1]*100/hits_one[1];
 
-    G.ps[0] = (hits_one[0] == 0) ? 0 : G.volume[0] * MULT_VOLUME;
-    G.ps[1] = (hits_one[1] == 0) ? 0 : G.volume[1] * MULT_VOLUME;
-    PT_Bests_All();
+    {
+        for (int i=0; i<2; i++)
+        {
+            Lado lados[2];
+            PT_Bests_Lado(G.bests[i][0], &lados[0]);
+            PT_Bests_Lado(G.bests[i][1], &lados[1]);
+
+            Lado *reves, *normal;
+            if (lados[0].avg1 <= lados[1].avg1) {
+                reves  = &lados[0];
+                normal = &lados[1];
+            } else {
+                reves  = &lados[1];
+                normal = &lados[0];
+            }
+
+            G.normal[i] = normal->avg1;
+            G.reves[i]  = (S.reves ? reves->avg2 : 0);
+            G.max_[i]   = max(normal->max_, reves->max_);
+        }
+    }
+
+    G.ps[0] = (G.volume[0]*MULT_VOLUME + G.normal[0]*MULT_NORMAL + G.reves[0]*MULT_REVES) / MULT_DIV;
+    G.ps[1] = (G.volume[1]*MULT_VOLUME + G.normal[1]*MULT_NORMAL + G.reves[1]*MULT_REVES) / MULT_DIV;
 
     u32 pct   = min(990, Falls()*CONT_PCT);
     u32 avg   = (G.ps[0] + G.ps[1]) / 2;

@@ -76,6 +76,7 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 #define MULT_VOLUME     7
 #define MULT_NORMAL     2
 #define MULT_REVES      1
+#define MULT_DIV        (MULT_VOLUME + MULT_NORMAL + MULT_REVES)
 
 static int  STATE;
 static bool IS_BACK;
@@ -121,7 +122,9 @@ typedef struct {
     u16  total;
     u16  ps[2];                       // volume+reves+normal (x100)
     u16  volume[2];                   // avg2/avg2 (x100)
-    Lado lados[2][2];
+    u16  reves[2];                    // avg (x100)
+    u16  normal[2];                   // avg (x100)
+    u8   max_[2];                     // kmh
 } Game;
 static Game G;
 
