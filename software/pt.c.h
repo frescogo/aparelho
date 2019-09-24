@@ -79,12 +79,12 @@ void PT_All (void) {
                 pace[0] += kmh;
                 pace[1] += kmh*kmh;
 
-                int idx = (i%2);
-                volume[idx] += kmh*kmh;
-                hits_one[idx]++;
+                int player = 1 - (i%2);
+                volume[player] += kmh*kmh;
+                hits_one[player]++;
 
                 // bests
-                s8* vec = G.bests[ 1-(i%2) ][ dt>0||!S.reves ];
+                s8* vec = G.bests[player][ dt>0||!S.reves ];
                 for (int j=0; j<HITS_BESTS; j++) {
                     if (kmh > vec[j]) {
                         for (int k=HITS_BESTS-1; k>j; k--) {
@@ -96,7 +96,7 @@ void PT_All (void) {
                 }
                 // marca os reves somente para exibicao
                 if (!S.reves && dt<0) {
-                    s8* vec = G.bests[ 1-(i%2) ][0];
+                    s8* vec = G.bests[player][0];
                     for (int j=0; j<HITS_BESTS; j++) {
                         if (vec[j] == 0) {
                             vec[j] = kmh;
@@ -139,11 +139,11 @@ void PT_All (void) {
         }
     }
 
-    G.jogs[0].total = (G.jogs[0].volume*MULT_VOLUME + G.jogs[0].normal*MULT_NORMAL + G.jogs[0].reves*MULT_REVES) / MULT_DIV;
-    G.jogs[1].total = (G.jogs[1].volume*MULT_VOLUME + G.jogs[1].normal*MULT_NORMAL + G.jogs[1].reves*MULT_REVES) / MULT_DIV;
+    G.jogs[0].total = (((u32)G.jogs[0].volume)*MULT_VOLUME + ((u32)G.jogs[0].normal)*MULT_NORMAL + ((u32)G.jogs[0].reves)*MULT_REVES) / MULT_DIV;
+    G.jogs[1].total = (((u32)G.jogs[1].volume)*MULT_VOLUME + ((u32)G.jogs[1].normal)*MULT_NORMAL + ((u32)G.jogs[1].reves)*MULT_REVES) / MULT_DIV;
 
     u32 avg   = (G.jogs[0].total + G.jogs[1].total) / 2;
     u32 pct   = Falls() * CONT_PCT;
-    u32 total = (!S.equilibrio ? avg : min(avg, min(G.jogs[0].total,G.jogs[1].total)*11/10));
+    u32 total = (!S.equilibrio ? avg : min(avg, ((u32)min(G.jogs[0].total,G.jogs[1].total))*11/10));
     G.total   = total * (1000-pct) / 1000;
 }
