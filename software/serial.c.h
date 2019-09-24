@@ -47,8 +47,8 @@ void Serial_Score (void) {
 
         sprintf_P(STR, PSTR("%10s: "), S.names[i]);
         Serial.print(STR);
-        Serial.print(G.jogs[i].total/100);
-        Serial.print(F(" pts "));
+        sprintf_P(STR, PSTR("%02d.%02d pts "), G.jogs[i].total/100, G.jogs[i].total%100);
+        Serial.print(STR);
         sprintf_P(STR, PSTR("(%02d.%02d vol / %02d.%02d nrm / %02d.%02d rev)"),
             G.jogs[i].volume/100, G.jogs[i].volume%100,
             G.jogs[i].normal/100, G.jogs[i].normal%100,
@@ -59,7 +59,7 @@ void Serial_Score (void) {
             Serial.print( (j==0) ? F(" rev ") : F(" nrm ") );
             Serial.print(F(" [ "));
             for (int k=0; k<HITS_BESTS; k++) {
-                sprintf_P(STR, PSTR("%2d "), (int)G.bests[i][i][k]);
+                sprintf_P(STR, PSTR("%02d "), (int)G.bests[i][j][k]);
                 Serial.print(STR);
             }
             Serial.println(F("]"));
@@ -89,7 +89,7 @@ void Serial_Log (void) {
     Serial.println();
 
     int ball  = 0;
-    u32 ps[2] = {0,0};
+    //u32 ps[2] = {0,0};
     for (int i=0 ; i<S.hit ; i++) {
         s8  dt  = S.dts[i];
         u8  kmh = G.kmhs[i];
@@ -97,7 +97,7 @@ void Serial_Log (void) {
         if (dt == HIT_SERV) {
             ball = ball + 1;
             Serial.print(F("-- Sequencia "));
-            sprintf_P(STR, PSTR("%2d"), ball);
+            sprintf_P(STR, PSTR("%02d"), ball);
             Serial.print(STR);
             Serial.println(F(" ----------------"));
         }
@@ -131,14 +131,14 @@ void Serial_Log (void) {
 
         if (i==S.hit-1 || S.dts[i+1]==HIT_NONE || S.dts[i+1]==HIT_SERV) {
             Serial.println();
-            Serial.println(F("   -----   -----"));
-            sprintf_P(STR, PSTR("   %5ld   %5ld"), ps[0]/100, ps[1]/100);
-            Serial.println(STR);
+            //Serial.println(F("   -----   -----"));
+            //sprintf_P(STR, PSTR("   %5ld   %5ld"), ps[0]/100, ps[1]/100);
+            //Serial.println(STR);
         } else if (dt == HIT_SERV) {
             // ignore
         } else {
-            u16 pt = ((u16)kmh)*((u16)kmh);
-            ps[1 - i%2] += pt;
+            //u16 pt = ((u16)kmh)*((u16)kmh);
+            //ps[1 - i%2] += pt;
 
             Serial.print(F("  "));
             if (!back2) {
@@ -147,7 +147,7 @@ void Serial_Log (void) {
             if (i%2 == 0) {
                 Serial.print(F("        "));
             }
-            sprintf_P(STR, PSTR("(%3d / %4d)"), kmh, pt);
+            sprintf_P(STR, PSTR("(%02d km/h)"), kmh); //, pt);
             Serial.print(STR);
         }
         Serial.println();
@@ -158,14 +158,14 @@ void Serial_Log (void) {
     Serial.println(F("-----------------------------------------------"));
     Serial.println();
 
-    Serial.println(F("    Atleta    Vol    Nrm    Rev    Total"));
+    Serial.println(F("    Atleta   |    Vol     Nrm     Rev    |     Total"));
     for (int i=0; i<2; i++) {
-        sprintf_P(STR, PSTR("%10s: %2d.%2d   %2d.%2d   %2d.%2d   %2d.%2d pts"),
-            S.names[1],
-            G.jogs[1].volume/100, G.jogs[1].volume%100,
-            G.jogs[1].normal/100, G.jogs[1].normal%100,
-            G.jogs[1].reves /100, G.jogs[1].reves %100,
-            G.jogs[1].total /100, G.jogs[1].total %100);
+        sprintf_P(STR, PSTR("%10s   |   %02d.%02d   %02d.%02d   %02d.%02d   |   %02d.%02d pts"),
+            S.names[i],
+            G.jogs[i].volume/100, G.jogs[i].volume%100,
+            G.jogs[i].normal/100, G.jogs[i].normal%100,
+            G.jogs[i].reves /100, G.jogs[i].reves %100,
+            G.jogs[i].total /100, G.jogs[i].total %100);
         Serial.println(STR);
     }
 
@@ -174,18 +174,16 @@ void Serial_Log (void) {
     Serial.println();
 
     u16 avg = (G.jogs[0].total + G.jogs[1].total) / 2;
-    u16 equ = (S.equilibrio ? (avg/100)-(G.total/100) : 0);
-    u32 pct = Falls() * CONT_PCT;
-    u16 que = G.total*pct/100000;
+    u16 equ = (!S.equilibrio ? 0 : avg - min(avg, min(G.jogs[0].total,G.jogs[1].total)*11/10));
 
-    sprintf_P(STR, PSTR("Media ........... %2d.%2d"), avg/100, avg%100);
+    sprintf_P(STR, PSTR("Media ........... %02d.%02d"), avg/100, avg%100);
     Serial.print(STR);
     Serial.println(F(" pts"));
-    sprintf_P(STR, PSTR("Equilibrio ...... %2d.%2d (-)"), equ/100, equ%100);
+    sprintf_P(STR, PSTR("Equilibrio ...... %02d.%02d (-)"), equ/100, equ%100);
     Serial.println(STR);
-    sprintf_P(STR, PSTR("Quedas (%02d) ..... %2d.%2d (-)"), que/100, que%100);
+    sprintf_P(STR, PSTR("Quedas (%02d) .....   %02d%% (-)"), Falls(), Falls()*CONT_PCT/10);
     Serial.println(STR);
-    sprintf_P(STR, PSTR("TOTAL ........... %2d.%2d"), G.total/100, G.total%100);
+    sprintf_P(STR, PSTR("TOTAL ........... %02d.%02d"), G.total/100, G.total%100);
     Serial.print(STR);
     Serial.println(F(" pts"));
 }

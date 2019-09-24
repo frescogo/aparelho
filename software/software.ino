@@ -501,15 +501,9 @@ void loop (void)
                         tone(PIN_TONE, NOTE_C4, 30);
                     } else if (S.equilibrio) {
                         // desequilibrio
-                        u32 p0  = G.jogs[0].total;
-                        u32 p1  = G.jogs[1].total;
-                        u32 avg = (p0 + p1) / 2;
-                        u32 m   = min(p0,p1);
-                        if (G.time >= 30000) {
-                            if (kmh>60 && PT_Behind()!=-1) {
-                                if (p0>p1 && nxt==0 || p1>p0 && nxt==1) {
-                                    tone(PIN_TONE, NOTE_C3, 30);
-                                }
+                        if (G.time >= 15000) {
+                            if (PT_Behind() == nxt) {
+                                tone(PIN_TONE, NOTE_C3, 30);
                             }
                         }
                     }

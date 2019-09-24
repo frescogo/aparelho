@@ -12,8 +12,8 @@ void PT_Bests_Lado (s8* bests, Lado* lado) {
     //lado->min1 = bests[HITS_BESTS-1];
     //lado->min2 = bests[HITS_BESTS/2-1];
     //lado->max_ = bests[0];
-    int sum1 = 0;
-    int sum2 = 0;
+    u32 sum1 = 0;
+    u32 sum2 = 0;
     //lado->tot1 = HITS_BESTS;
     //lado->tot2 = HITS_BESTS/2;
     for (int i=0; i<HITS_BESTS; i++) {
@@ -80,7 +80,7 @@ void PT_All (void) {
                 pace[1] += kmh*kmh;
 
                 int idx = (i%2);
-                volume[idx] = kmh*kmh;
+                volume[idx] += kmh*kmh;
                 hits_one[idx]++;
 
                 // bests
@@ -114,8 +114,8 @@ void PT_All (void) {
     G.pace[0] = pace[0]/G.hits;
     G.pace[1] = pace[1]/G.hits;
 
-    G.jogs[0].volume = (hits_one[0] == 0) ? 0 : volume[0]*100/hits_one[0];
-    G.jogs[1].volume = (hits_one[1] == 0) ? 0 : volume[1]*100/hits_one[1];
+    G.jogs[0].volume = (hits_one[0] == 0) ? 0 : sqrt(volume[0]*10000/hits_one[0]);
+    G.jogs[1].volume = (hits_one[1] == 0) ? 0 : sqrt(volume[1]*10000/hits_one[1]);
 
     {
         for (int i=0; i<2; i++)
@@ -142,8 +142,8 @@ void PT_All (void) {
     G.jogs[0].total = (G.jogs[0].volume*MULT_VOLUME + G.jogs[0].normal*MULT_NORMAL + G.jogs[0].reves*MULT_REVES) / MULT_DIV;
     G.jogs[1].total = (G.jogs[1].volume*MULT_VOLUME + G.jogs[1].normal*MULT_NORMAL + G.jogs[1].reves*MULT_REVES) / MULT_DIV;
 
-    u32 pct   = min(990, Falls()*CONT_PCT);
     u32 avg   = (G.jogs[0].total + G.jogs[1].total) / 2;
-    u32 total = (S.equilibrio ? min(avg, min(G.jogs[0].total,G.jogs[1].total)*11/10) : avg);
-    G.total   = total * (1000-pct) / 100000;
+    u32 pct   = Falls() * CONT_PCT;
+    u32 total = (!S.equilibrio ? avg : min(avg, min(G.jogs[0].total,G.jogs[1].total)*11/10));
+    G.total   = total * (1000-pct) / 1000;
 }
