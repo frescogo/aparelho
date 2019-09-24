@@ -101,7 +101,7 @@ static Save S;
 typedef struct {
     u16 avg1;   // media de velocidade considerando HITS_BESTS (x100)
     u16 avg2;   // media de velocidade considerando HITS_BESTS/2 (x100)
-    int max_;   // maior velocidade
+    //int max_;   // maior velocidade
     //int tot1;   // total de golpes     considerando HITS_BESTS
     //int min1;   // menor velocidade    considerando HITS_BESTS
     //int tot2;   // total de golpes     considerando HITS_BESTS/2
@@ -124,7 +124,7 @@ typedef struct {
     u16  volume[2];                   // avg2/avg2 (x100)
     u16  reves[2];                    // avg (x100)
     u16  normal[2];                   // avg (x100)
-    u8   max_[2];                     // kmh
+    //u8   max_[2];                     // kmh
 } Game;
 static Game G;
 

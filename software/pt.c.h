@@ -1,7 +1,7 @@
 void PT_Bests_Lado (s8* bests, Lado* lado) {
     //lado->min1 = bests[HITS_BESTS-1];
     //lado->min2 = bests[HITS_BESTS/2-1];
-    lado->max_ = bests[0];
+    //lado->max_ = bests[0];
     int sum1 = 0;
     int sum2 = 0;
     //lado->tot1 = HITS_BESTS;
@@ -125,7 +125,7 @@ void PT_All (void) {
 
             G.normal[i] = normal->avg1;
             G.reves[i]  = (S.reves ? reves->avg2 : 0);
-            G.max_[i]   = max(normal->max_, reves->max_);
+            //G.max_[i]   = max(normal->max_, reves->max_);
         }
     }
 

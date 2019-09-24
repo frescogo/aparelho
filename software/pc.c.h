@@ -44,8 +44,8 @@ void PC_Player (int I) {
     Serial.print(F(";"));
     Serial.print(PT_Behind() == I ? 1 : 0);   // 1=atras | 0=ok
     Serial.print(F(";"));
-    Serial.print(G.max_[I]);          // maior velocidade
-    Serial.print(F(";"));
+    //Serial.print(G.max_[I]);          // maior velocidade
+    //Serial.print(F(";"));
 
     Serial.print(G.volume[I]/100);    // volume
     Serial.print(F(";"));
