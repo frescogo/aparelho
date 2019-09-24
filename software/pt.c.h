@@ -114,8 +114,8 @@ void PT_All (void) {
     G.pace[0] = pace[0]/G.hits;
     G.pace[1] = pace[1]/G.hits;
 
-    G.jogs[0].volume = (hits_one[0] == 0) ? 0 : sqrt(volume[0]*10000/hits_one[0]);
-    G.jogs[1].volume = (hits_one[1] == 0) ? 0 : sqrt(volume[1]*10000/hits_one[1]);
+    G.jogs[0].volume = (hits_one[0] == 0) ? 0 : sqrt(volume[0]*1000/hits_one[0]*10);
+    G.jogs[1].volume = (hits_one[1] == 0) ? 0 : sqrt(volume[1]*1000/hits_one[1]*10);
 
     {
         for (int i=0; i<2; i++)
