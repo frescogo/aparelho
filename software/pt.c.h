@@ -1,3 +1,13 @@
+typedef struct {
+    u16 avg1;   // media de velocidade considerando HITS_BESTS (x100)
+    u16 avg2;   // media de velocidade considerando HITS_BESTS/2 (x100)
+    //int max_;   // maior velocidade
+    //int tot1;   // total de golpes     considerando HITS_BESTS
+    //int min1;   // menor velocidade    considerando HITS_BESTS
+    //int tot2;   // total de golpes     considerando HITS_BESTS/2
+    //int min2;   // menor velocidade    considerando HITS_BESTS/2
+} Lado;
+
 void PT_Bests_Lado (s8* bests, Lado* lado) {
     //lado->min1 = bests[HITS_BESTS-1];
     //lado->min2 = bests[HITS_BESTS/2-1];
@@ -23,8 +33,8 @@ void PT_Bests_Lado (s8* bests, Lado* lado) {
 }
 
 int PT_Behind (void) {
-    u32 p0  = G.ps[0];
-    u32 p1  = G.ps[1];
+    u32 p0  = G.jogs[0].total;
+    u32 p1  = G.jogs[1].total;
     u32 avg = (p0 + p1) / 2;
     u32 m   = min(p0,p1);
     if (m * 11/10 < avg) {
@@ -104,8 +114,8 @@ void PT_All (void) {
     G.pace[0] = pace[0]/G.hits;
     G.pace[1] = pace[1]/G.hits;
 
-    G.volume[0] = (hits_one[0] == 0) ? 0 : volume[0]*100/hits_one[0];
-    G.volume[1] = (hits_one[1] == 0) ? 0 : volume[1]*100/hits_one[1];
+    G.jogs[0].volume = (hits_one[0] == 0) ? 0 : volume[0]*100/hits_one[0];
+    G.jogs[1].volume = (hits_one[1] == 0) ? 0 : volume[1]*100/hits_one[1];
 
     {
         for (int i=0; i<2; i++)
@@ -123,17 +133,17 @@ void PT_All (void) {
                 normal = &lados[0];
             }
 
-            G.normal[i] = normal->avg1;
-            G.reves[i]  = (S.reves ? reves->avg2 : 0);
+            G.jogs[i].normal = normal->avg1;
+            G.jogs[i].reves  = (S.reves ? reves->avg2 : 0);
             //G.max_[i]   = max(normal->max_, reves->max_);
         }
     }
 
-    G.ps[0] = (G.volume[0]*MULT_VOLUME + G.normal[0]*MULT_NORMAL + G.reves[0]*MULT_REVES) / MULT_DIV;
-    G.ps[1] = (G.volume[1]*MULT_VOLUME + G.normal[1]*MULT_NORMAL + G.reves[1]*MULT_REVES) / MULT_DIV;
+    G.jogs[0].total = (G.jogs[0].volume*MULT_VOLUME + G.jogs[0].normal*MULT_NORMAL + G.jogs[0].reves*MULT_REVES) / MULT_DIV;
+    G.jogs[1].total = (G.jogs[1].volume*MULT_VOLUME + G.jogs[1].normal*MULT_NORMAL + G.jogs[1].reves*MULT_REVES) / MULT_DIV;
 
     u32 pct   = min(990, Falls()*CONT_PCT);
-    u32 avg   = (G.ps[0] + G.ps[1]) / 2;
-    u32 total = (S.equilibrio ? min(avg, min(G.ps[0],G.ps[1])*11/10) : avg);
+    u32 avg   = (G.jogs[0].total + G.jogs[1].total) / 2;
+    u32 total = (S.equilibrio ? min(avg, min(G.jogs[0].total,G.jogs[1].total)*11/10) : avg);
     G.total   = total * (1000-pct) / 100000;
 }

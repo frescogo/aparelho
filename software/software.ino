@@ -99,14 +99,12 @@ typedef struct {
 static Save S;
 
 typedef struct {
-    u16 avg1;   // media de velocidade considerando HITS_BESTS (x100)
-    u16 avg2;   // media de velocidade considerando HITS_BESTS/2 (x100)
-    //int max_;   // maior velocidade
-    //int tot1;   // total de golpes     considerando HITS_BESTS
-    //int min1;   // menor velocidade    considerando HITS_BESTS
-    //int tot2;   // total de golpes     considerando HITS_BESTS/2
-    //int min2;   // menor velocidade    considerando HITS_BESTS/2
-} Lado;
+    u16  total;                    // volume+reves+normal (x100)
+    u16  volume;                   // avg2/avg2 (x100)
+    u16  reves;                    // avg (x100)
+    u16  normal;                   // avg (x100)
+    //u8   max_;                     // kmh
+} Jog;
 
 typedef struct {
     // needed on EEPROM_Load
@@ -120,11 +118,7 @@ typedef struct {
     s8   pace[2];                     // kmh/kmh2
 
     u16  total;
-    u16  ps[2];                       // volume+reves+normal (x100)
-    u16  volume[2];                   // avg2/avg2 (x100)
-    u16  reves[2];                    // avg (x100)
-    u16  normal[2];                   // avg (x100)
-    //u8   max_[2];                     // kmh
+    Jog  jogs[2];
 } Game;
 static Game G;
 
@@ -507,8 +501,8 @@ void loop (void)
                         tone(PIN_TONE, NOTE_C4, 30);
                     } else if (S.equilibrio) {
                         // desequilibrio
-                        u32 p0  = G.ps[0];
-                        u32 p1  = G.ps[1];
+                        u32 p0  = G.jogs[0].total;
+                        u32 p1  = G.jogs[1].total;
                         u32 avg = (p0 + p1) / 2;
                         u32 m   = min(p0,p1);
                         if (G.time >= 30000) {

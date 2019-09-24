@@ -40,18 +40,18 @@ void PC_Seq (void) {
 }
 
 void PC_Player (int I) {
-    Serial.print(G.ps[I]/100);        // pontuacao
+    Serial.print(G.jogs[I].total/100);        // pontuacao
     Serial.print(F(";"));
     Serial.print(PT_Behind() == I ? 1 : 0);   // 1=atras | 0=ok
     Serial.print(F(";"));
     //Serial.print(G.max_[I]);          // maior velocidade
     //Serial.print(F(";"));
 
-    Serial.print(G.volume[I]/100);    // volume
+    Serial.print(G.jogs[I].volume/100);    // volume
     Serial.print(F(";"));
-    Serial.print(G.normal[I]);        // media normal
+    Serial.print(G.jogs[I].normal);        // media normal
     Serial.print(F(";"));
-    Serial.print(G.reves[I]);         // media de revez
+    Serial.print(G.jogs[I].reves);         // media de revez
     Serial.print(F(";"));
 
     //Serial.print(normal->tot1);     // total normais
