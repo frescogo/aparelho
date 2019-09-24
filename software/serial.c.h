@@ -12,7 +12,8 @@ void Serial_Score (void) {
     Serial.println();
 
     Serial.print(F("TOTAL .............. "));
-    sprintf_P(STR, PSTR("%02d:%02d"), G.total/100, G.total%100);
+    sprintf_P(STR, PSTR("%02d.%02d"), G.total/100, G.total%100);
+    Serial.print(STR);
     Serial.println(F(" pts"));
 
     Serial.print(F("Tempo Restante ..... "));
@@ -48,7 +49,7 @@ void Serial_Score (void) {
         Serial.print(STR);
         Serial.print(G.jogs[i].total/100);
         Serial.print(F(" pts "));
-        sprintf_P(STR, PSTR("(%02d,%02d vol / %02d,%02d nrm / %02d,%02d rev)"),
+        sprintf_P(STR, PSTR("(%02d.%02d vol / %02d.%02d nrm / %02d.%02d rev)"),
             G.jogs[i].volume/100, G.jogs[i].volume%100,
             G.jogs[i].normal/100, G.jogs[i].normal%100,
             G.jogs[i].reves /100, G.jogs[i].reves %100);
