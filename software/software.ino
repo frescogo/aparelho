@@ -482,6 +482,9 @@ void loop (void)
             if (G.time >= S.timeout) {
                 goto _TIMEOUT;
             }
+            if (S.hit >= HITS_MAX-5) {
+                goto _TIMEOUT;
+            }
 
             // sleep inside hit to reach S.reves
             {
