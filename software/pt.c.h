@@ -1,35 +1,35 @@
 typedef struct {
-    u16 avg1;   // media de velocidade considerando HITS_BESTS (x100)
-    u16 avg2;   // media de velocidade considerando HITS_BESTS/2 (x100)
+    u16 avg1;   // media de velocidade considerando HITS_NRM (x100)
+    u16 avg2;   // media de velocidade considerando HITS_REV (x100)
     //int max_;   // maior velocidade
-    //int tot1;   // total de golpes     considerando HITS_BESTS
-    //int min1;   // menor velocidade    considerando HITS_BESTS
-    //int tot2;   // total de golpes     considerando HITS_BESTS/2
-    //int min2;   // menor velocidade    considerando HITS_BESTS/2
+    //int tot1;   // total de golpes     considerando HITS_NRM
+    //int min1;   // menor velocidade    considerando HITS_NRM
+    //int tot2;   // total de golpes     considerando HITS_REV
+    //int min2;   // menor velocidade    considerando HITS_REV
 } Lado;
 
 void PT_Bests_Lado (s8* bests, Lado* lado) {
-    //lado->min1 = bests[HITS_BESTS-1];
-    //lado->min2 = bests[HITS_BESTS/2-1];
+    //lado->min1 = bests[HITS_NRM-1];
+    //lado->min2 = bests[HITS_REV-1];
     //lado->max_ = bests[0];
     u32 sum1 = 0;
     u32 sum2 = 0;
-    //lado->tot1 = HITS_BESTS;
-    //lado->tot2 = HITS_BESTS/2;
-    for (int i=0; i<HITS_BESTS; i++) {
+    //lado->tot1 = HITS_NRM;
+    //lado->tot2 = HITS_REV;
+    for (int i=0; i<HITS_NRM; i++) {
         s8 v = bests[i];
         if (v == 0) {
             //lado->tot1 = i;
-            //lado->tot2 = min(i, HITS_BESTS/2);
+            //lado->tot2 = min(i, HITS_REV);
             break;
         }
         sum1 += v;
-        if (i < HITS_BESTS/2) {
+        if (i < HITS_REV) {
             sum2 += v;
         }
     }
-    lado->avg1 = sum1*100/HITS_BESTS;
-    lado->avg2 = sum2*100/(HITS_BESTS/2);
+    lado->avg1 = sum1*100/HITS_NRM;
+    lado->avg2 = sum2*100/(HITS_REV);
 }
 
 int PT_Behind (void) {
@@ -53,7 +53,7 @@ void PT_All (void) {
     G.hits  = 0;
     G.servs = 0;
 
-    memset(G.bests, 0, 2*2*HITS_BESTS_MAX*sizeof(s8));
+    memset(G.bests, 0, 2*2*REF_BESTS*sizeof(s8));
 
     u32 pace[2] = {0,0};        // overall   avg, avg2
 
@@ -85,9 +85,9 @@ void PT_All (void) {
 
                 // bests
                 s8* vec = G.bests[player][ dt>0||!S.reves ];
-                for (int j=0; j<HITS_BESTS; j++) {
+                for (int j=0; j<HITS_NRM; j++) {
                     if (kmh > vec[j]) {
-                        for (int k=HITS_BESTS-1; k>j; k--) {
+                        for (int k=HITS_NRM-1; k>j; k--) {
                             vec[k] = vec[k-1];
                         }
                         vec[j] = kmh;
@@ -97,7 +97,7 @@ void PT_All (void) {
                 // marca os reves somente para exibicao
                 if (!S.reves && dt<0) {
                     s8* vec = G.bests[player][0];
-                    for (int j=0; j<HITS_BESTS; j++) {
+                    for (int j=0; j<HITS_NRM; j++) {
                         if (vec[j] == 0) {
                             vec[j] = kmh;
                             break;

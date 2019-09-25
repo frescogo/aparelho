@@ -58,7 +58,7 @@ void Serial_Score (void) {
         for (int j=0; j<2; j++) {
             Serial.print( (j==0) ? F(" rev ") : F(" nrm ") );
             Serial.print(F(" [ "));
-            for (int k=0; k<HITS_BESTS; k++) {
+            for (int k=0; k<REF_BESTS; k++) {
                 sprintf_P(STR, PSTR("%02d "), (int)G.bests[i][j][k]);
                 Serial.print(STR);
             }

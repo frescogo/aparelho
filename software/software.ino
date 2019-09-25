@@ -46,8 +46,8 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 #define REF_ABORT       15          // 15s per fall
 
 #define HITS_MAX        650
-#define HITS_BESTS_MAX  REF_BESTS
-#define HITS_BESTS      (max(1, min(HITS_BESTS_MAX, (S.timeout*REF_BESTS/REF_TIMEOUT/1000))))
+#define HITS_NRM        (max(1, min(REF_BESTS, (S.timeout*REF_BESTS/REF_TIMEOUT/1000))))
+#define HITS_REV        (max(1, HITS_NRM*2/3))
 
 #define HIT_MIN_DT      235         // minimum time between two hits (125kmh)
 //#define HIT_KMH_MAX   125         // to fit in s8 (changed to u8, but lets keep 125)
@@ -73,9 +73,9 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 #define CONT_PCT        (((u32)REF_TIMEOUT)*REF_CONT/(S.timeout/1000))
 #define ABORT_FALLS     (S.timeout / REF_ABORT / 1000)
 
-#define MULT_VOLUME     7
-#define MULT_NORMAL     2
-#define MULT_REVES      1
+#define MULT_VOLUME     5
+#define MULT_NORMAL     3
+#define MULT_REVES      2
 #define MULT_DIV        (MULT_VOLUME + MULT_NORMAL + MULT_REVES)
 
 static int  STATE;
@@ -111,7 +111,7 @@ typedef struct {
     u8   kmhs[HITS_MAX];              // kmh (max 125km/h)
 
     // calculated when required
-    s8   bests[2][2][HITS_BESTS_MAX]; // kmh (max 125kmh/h)
+    s8   bests[2][2][REF_BESTS];      // kmh (max 125kmh/h)
     u32  time;                        // ms (total time)
     u16  hits;
     u8   servs;
