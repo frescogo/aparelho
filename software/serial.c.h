@@ -230,15 +230,15 @@ _COMPLETE:
         Serial_Log();
         return IN_NONE;
     } else if (strncmp_P(CMD, PSTR("tempo "), 6) == 0) {
-        S.timeout = ((u32) max(0, atoi(&CMD[6]))) * 1000;
+        S.timeout = ((u32) max(10, atoi(&CMD[6]))) * 1000;
     } else if (strncmp_P(CMD, PSTR("distancia "), 5) == 0) {
-        S.distancia = max(0, min(1000, atoi(&CMD[10]));
+        S.distancia = max(100, min(1000, atoi(&CMD[10])));
     } else if (strncmp_P(CMD, PSTR("equilibrio sim"), 14) == 0) {
         S.equilibrio = 1;
     } else if (strncmp_P(CMD, PSTR("equilibrio nao"), 14) == 0) {
         S.equilibrio = 0;
     } else if (strncmp_P(CMD, PSTR("maxima "), 7) == 0) {
-        S.maxima = max(0, min(HIT_KMH_MAX, atoi(&CMD[7])));
+        S.maxima = max(50, min(HIT_KMH_MAX, atoi(&CMD[7])));
     } else if (strncmp_P(CMD, PSTR("reves "), 5) == 0) {
         S.reves = atoi(&CMD[5]);
         if (S.reves != 0) {
