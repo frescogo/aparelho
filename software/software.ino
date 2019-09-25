@@ -435,7 +435,8 @@ void loop (void)
 
             t0 = t1;
 
-            if (nxt != got) {
+            bool skipped = (nxt != got);
+            if (skipped) {
                 dt = dt / 2;
             }
             dt = min(dt/10, 127); // we don't have space for dt>1270ms,so we'll
@@ -454,13 +455,6 @@ void loop (void)
                 Sound(kmh);
             }
 
-            if (nxt != got) {
-                MODE(CEL_Hit(  got,IS_BACK,kmh), PC_Hit(  got,IS_BACK,kmh));
-                MODE(CEL_Hit(1-got,false,  kmh), PC_Hit(1-got,false,  kmh));
-            } else {
-                MODE(CEL_Hit(1-got,IS_BACK,kmh), PC_Hit(1-got,IS_BACK,kmh));
-            }
-
             if (IS_BACK) {
                 S.dts[S.hit] = -dt;
             } else {
@@ -468,7 +462,7 @@ void loop (void)
             }
             G.kmhs[S.hit] = kmh;
             S.hit++;
-            if (nxt != got) {
+            if (skipped) {
                 S.dts[S.hit]  = dt;
                 G.kmhs[S.hit] = kmh;
                 S.hit++;
@@ -511,6 +505,13 @@ void loop (void)
                         }
                     }
                 }
+            }
+
+            if (skipped) {
+                MODE(CEL_Hit(  got,IS_BACK,kmh), PC_Hit(  got,IS_BACK,kmh));
+                MODE(CEL_Hit(1-got,false,  kmh), PC_Hit(1-got,false,  kmh));
+            } else {
+                MODE(CEL_Hit(1-got,IS_BACK,kmh), PC_Hit(1-got,IS_BACK,kmh));
             }
 
             // sleep inside hit to reach HIT_MIN_DT
