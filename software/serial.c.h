@@ -173,8 +173,10 @@ void Serial_Log (void) {
     Serial.println(F("-----------------------------------------------"));
     Serial.println();
 
-    u16 avg = (G.jogs[0].total + G.jogs[1].total) / 2;
-    u16 equ = (!S.equilibrio ? 0 : avg - min(avg, ((u32)min(G.jogs[0].total,G.jogs[1].total))*11/10));
+    u16 avg, min_;
+    PT_Equ(&avg,&min_);
+
+    u16 equ = (!S.equilibrio ? 0 : avg - min_);
 
     sprintf_P(STR, PSTR("Media ........... %02d.%02d"), avg/100, avg%100);
     Serial.print(STR);

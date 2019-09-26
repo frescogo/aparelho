@@ -32,13 +32,18 @@ void PT_Bests_Lado (s8* bests, Lado* lado) {
     lado->avg2 = sum2*100/(HITS_REV);
 }
 
+int PT_Equ (u16* avg, u16* min_) {
+    u16 p0  = G.jogs[0].total;
+    u16 p1  = G.jogs[1].total;
+    *avg  = (p0 + p1) / 2;
+    *min_ = min(*avg, ((u32)min(p0,p1))*EQU_PCT);
+    return *avg == *min_;
+}
+
 int PT_Behind (void) {
-    u32 p0  = G.jogs[0].total;
-    u32 p1  = G.jogs[1].total;
-    u32 avg = (p0 + p1) / 2;
-    u32 m   = min(p0,p1);
-    if (m * 11/10 < avg) {
-        if (p0 < p1) {
+    u16 avg, min_;
+    if (!PT_Equ(&avg,&min_)) {
+        if (G.jogs[0].total < G.jogs[1].total) {
             return 0;   // atleta a esquerda atras
         } else {
             return 1;   // atleta a direita  atras
@@ -142,8 +147,10 @@ void PT_All (void) {
     G.jogs[0].total = (((u32)G.jogs[0].volume)*MULT_VOLUME + ((u32)G.jogs[0].normal)*MULT_NORMAL + ((u32)G.jogs[0].reves)*MULT_REVES) / MULT_DIV;
     G.jogs[1].total = (((u32)G.jogs[1].volume)*MULT_VOLUME + ((u32)G.jogs[1].normal)*MULT_NORMAL + ((u32)G.jogs[1].reves)*MULT_REVES) / MULT_DIV;
 
-    u32 avg   = (G.jogs[0].total + G.jogs[1].total) / 2;
-    u32 pct   = Falls() * CONT_PCT;
-    u32 total = (!S.equilibrio ? avg : min(avg, ((u32)min(G.jogs[0].total,G.jogs[1].total))*11/10));
+    u16 avg, min_;
+    PT_Equ(&avg,&min_);
+
+    int pct   = Falls() * CONT_PCT;
+    u32 total = (!S.equilibrio ? min_ : avg);
     G.total   = total * (1000-pct) / 1000;
 }
