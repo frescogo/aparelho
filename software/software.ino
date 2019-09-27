@@ -74,9 +74,9 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 #define CONT_PCT        (((u32)REF_TIMEOUT)*REF_CONT/(S.timeout/1000))
 #define ABORT_FALLS     (S.timeout / REF_ABORT / 1000)
 
-#define MULT_VOLUME     5
-#define MULT_NORMAL     3
-#define MULT_REVES      2
+#define MULT_VOLUME     60
+#define MULT_NORMAL     25
+#define MULT_REVES      15
 #define MULT_DIV        (MULT_VOLUME + MULT_NORMAL + MULT_REVES)
 
 static int  STATE;
