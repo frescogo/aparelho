@@ -456,8 +456,8 @@ void loop (void)
                 Sound(kmh);
             }
 
-            if (IS_BACK) {
-                S.dts[S.hit] = -dt;
+            if (IS_BACK && (kmh >= G.kmhs[S.hit-1]*12/10)) {
+                S.dts[S.hit] = -dt;     // 20% mais forte que golpe anterior
             } else {
                 S.dts[S.hit] = dt;
             }
