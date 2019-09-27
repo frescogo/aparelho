@@ -115,6 +115,7 @@ void PT_All (void) {
         }
     }
     G.time *= 10;
+    G.time = min(G.time, S.timeout);
 
     G.pace[0] = pace[0]/G.hits;
     G.pace[1] = pace[1]/G.hits;
@@ -150,7 +151,7 @@ void PT_All (void) {
     u16 avg, min_;
     PT_Equ(&avg,&min_);
 
-    int pct   = Falls() * CONT_PCT;
+    int pct   = Falls() * CONT_PCT(G.time);
     u32 total = (!S.equilibrio ? min_ : avg);
     G.total   = total * (1000-pct) / 1000;
 }

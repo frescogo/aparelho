@@ -71,7 +71,7 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 #define POT_VEL         50
 
 #define EQU_PCT         105/100 // do not use parenthesis (multiply before division)
-#define CONT_PCT        (((u32)REF_TIMEOUT)*REF_CONT/(S.timeout/1000))
+#define CONT_PCT(tot)   (((u32)REF_TIMEOUT)*REF_CONT/((tot)/1000))
 #define ABORT_FALLS     (S.timeout / REF_ABORT / 1000)
 
 #define MULT_VOLUME     60

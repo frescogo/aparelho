@@ -78,7 +78,7 @@ void Serial_Score (void) {
                 (int)S.maxima,
                 (int)S.reves,
                 (int)S.equilibrio,
-                (int)CONT_PCT,
+                (int)CONT_PCT(S.timeout),
                 (int)ABORT_FALLS);
     Serial.println(STR);
 }
@@ -183,7 +183,7 @@ void Serial_Log (void) {
     Serial.println(F(" pts"));
     sprintf_P(STR, PSTR("Equilibrio ...... %02d.%02d (-)"), equ/100, equ%100);
     Serial.println(STR);
-    sprintf_P(STR, PSTR("Quedas (%02d) .....   %02d%% (-)"), Falls(), Falls()*CONT_PCT/10);
+    sprintf_P(STR, PSTR("Quedas (%02d) .....   %02d%% (-)"), Falls(), Falls()*CONT_PCT(G.time)/10);
     Serial.println(STR);
     sprintf_P(STR, PSTR("TOTAL ........... %02d.%02d"), G.total/100, G.total%100);
     Serial.print(STR);
