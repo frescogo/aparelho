@@ -499,9 +499,9 @@ void loop (void)
                         tone(PIN_TONE, NOTE_C4, 30);
                     } else if (S.equilibrio) {
                         // desequilibrio
-                        if (G.time >= 15000) {
+                        if (G.time >= 30000) {
                             if (PT_Behind() == nxt) {
-                                tone(PIN_TONE, NOTE_C3, 30);
+                                tone(PIN_TONE, NOTE_C2, 30);
                             }
                         }
                     }
