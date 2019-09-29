@@ -70,6 +70,7 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 #define POT_BONUS       2
 #define POT_VEL         50
 
+#define REV_PCT         12/10   // do not use parenthesis (multiply before division)
 #define EQU_PCT         105/100 // do not use parenthesis (multiply before division)
 #define CONT_PCT(tot)   (((u32)REF_TIMEOUT)*REF_CONT/((tot)/1000))
 #define ABORT_FALLS     (S.timeout / REF_ABORT / 1000)
@@ -149,8 +150,12 @@ int Falls (void) {
 #include "xcel.c.h"
 #include "pc.c.h"
 
-void Sound (s8 kmh) {
-    if (kmh < 40) {
+void Sound (s8 kmh, bool is_back) {
+    if (is_back) {
+        tone(PIN_TONE, NOTE_C4, 20);
+        delay(35);
+        tone(PIN_TONE, NOTE_C4, 20);
+    } else if (kmh < 40) {
         tone(PIN_TONE, NOTE_C5, 50);
     } else if (kmh < 50) {
         tone(PIN_TONE, NOTE_E5, 50);
@@ -448,16 +453,18 @@ void loop (void)
             s8 kmh = min(kmh_, HIT_KMH_MAX);
             kmh = min(kmh_, S.maxima);
 
+            bool is_back = IS_BACK && (kmh >= G.kmhs[S.hit-1]*REV_PCT); // 10% mais forte que golpe anterior
+
             u8 al_now = 0;
             if (G.time+dt*10 > alarm()) {
                 tone(PIN_TONE, NOTE_C7, 250);
                 al_now = 1;
             } else {
-                Sound(kmh);
+                Sound(kmh, is_back);
             }
 
-            if (IS_BACK && (kmh >= G.kmhs[S.hit-1]*12/10)) {
-                S.dts[S.hit] = -dt;     // 20% mais forte que golpe anterior
+            if (is_back) {
+                S.dts[S.hit] = -dt;
             } else {
                 S.dts[S.hit] = dt;
             }
