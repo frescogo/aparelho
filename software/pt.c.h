@@ -29,7 +29,7 @@ void PT_Bests_Lado (s8* bests, Lado* lado) {
         }
     }
     lado->avg1 = sum1*100/HITS_NRM;
-    lado->avg2 = sum2*100/(HITS_REV);
+    lado->avg2 = sum2*100/HITS_REV;
 }
 
 int PT_Equ (u16* avg, u16* min_) {
