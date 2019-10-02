@@ -151,7 +151,7 @@ void PT_All (void) {
     u16 avg, min_;
     PT_Equ(&avg,&min_);
 
-    int pct   = Falls() * CONT_PCT(G.time);
+    int pct   = CONT_PCT(Falls(), G.time);
     u32 total = (!S.equilibrio ? min_ : avg);
     G.total   = total * (1000-pct) / 1000;
 }

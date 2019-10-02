@@ -72,7 +72,8 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 
 #define REV_PCT         11/10   // do not use parenthesis (multiply before division)
 #define EQU_PCT         105/100 // do not use parenthesis (multiply before division)
-#define CONT_PCT(t)     (((u32)REF_TIMEOUT)*REF_CONT/((t)/1000))
+#define CONT_MAX        (REF_CONT * REF_TIMEOUT / REF_ABORT)    // max PCT to loose (40%)
+#define CONT_PCT(f,t)   min(CONT_MAX, f * (((u32)REF_TIMEOUT)*REF_CONT*1000/max(1,t)))
 #define ABORT_FALLS     (S.timeout / REF_ABORT / 1000)
 
 #define MULT_VOLUME     60
