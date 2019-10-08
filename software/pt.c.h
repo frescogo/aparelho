@@ -81,8 +81,6 @@ void PT_All (void) {
             else
             {
                 G.hits++;
-                pace[0] += kmh;
-                pace[1] += kmh*kmh;
 
                 int player = 1 - (i%2);
                 volume[player] += kmh*kmh;
@@ -117,8 +115,7 @@ void PT_All (void) {
     G.time *= 10;
     G.time = min(G.time, S.timeout);
 
-    G.pace[0] = pace[0]/G.hits;
-    G.pace[1] = pace[1]/G.hits;
+    G.ritmo = (((u32)G.hits)*S.distancia*36) / G.time;
 
     G.jogs[0].volume = (hits_one[0] == 0) ? 0 : sqrt(volume[0]*1000/hits_one[0]*10);
     G.jogs[1].volume = (hits_one[1] == 0) ? 0 : sqrt(volume[1]*1000/hits_one[1]*10);

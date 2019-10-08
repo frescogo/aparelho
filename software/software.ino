@@ -118,7 +118,7 @@ typedef struct {
     u32  time;                        // ms (total time)
     u16  hits;
     u8   servs;
-    s8   pace[2];                     // kmh/kmh2
+    s8   ritmo;                       // kmh
 
     u16  total;
     Jog  jogs[2];

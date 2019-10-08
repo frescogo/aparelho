@@ -29,7 +29,7 @@ void Serial_Score (void) {
 
     Serial.print(F("Média .............. "));
     if (G.time > 5000) {
-        Serial.print((int)G.pace[0]);
+        Serial.print((int)G.ritmo);
         //Serial.print(F("/"));
         //Serial.print((int)G.pace[1]);
         Serial.println(F(" km/h"));
