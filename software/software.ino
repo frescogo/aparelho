@@ -1,6 +1,6 @@
 #define MAJOR    2
 #define MINOR    0
-#define REVISION 1
+#define REVISION 2
 
 //#define DEBUG
 
@@ -337,6 +337,7 @@ void loop (void)
             } else if (got == IN_RESTART) {
                 goto _RESTART;
             } else if (got==IN_UNDO && S.hit>0) {
+_UNDO:
                 while (1) {
                     S.hit -= 1;
                     if (S.hit == 0) {
@@ -356,7 +357,7 @@ void loop (void)
                 delay(310);
                 EEPROM_Save();
                 PT_All();
-                MODE(Serial_Score(), PC_Seq());
+                MODE(Serial_Score(), PC_Atualiza());
 
 /* No TIMEOUT outside playing: prevents falls miscount.
             } else if (got == IN_TIMEOUT) {
@@ -566,6 +567,12 @@ _TIMEOUT:
             goto _RESTART;
         } else if (got == IN_RESTART) {
             goto _RESTART;
+        } else if (got == IN_UNDO) {
+            STATE = STATE_IDLE;
+            if (Falls() >= ABORT_FALLS) {
+                S.hit--;    // reverse above
+            }
+            goto _UNDO;
         }
     }
 

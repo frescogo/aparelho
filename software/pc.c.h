@@ -96,6 +96,14 @@ void PC_End (void) {
 void PC_Nop (void) {
 }
 
+void PC_Atualiza (void) {
+    PC_Seq();
+    PC_Hit(0,0,0);
+    PC_Hit(1,0,0);
+    PC_Tick();
+    PC_Fall();
+}
+
 void PC_Restart (void) {
     Serial.print(PC_RESTART);           // codigo de reinicio
     Serial.print(F(";"));
@@ -110,10 +118,5 @@ void PC_Restart (void) {
     Serial.print(S.juiz);               // juiz
     Serial.print(F(";"));
     Serial_Pars();
-
-    PC_Seq();
-    PC_Hit(0,0,0);
-    PC_Hit(1,0,0);
-    PC_Tick();
-    PC_Fall();
+    PC_Atualiza();
 }
