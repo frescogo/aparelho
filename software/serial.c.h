@@ -1,3 +1,17 @@
+void Serial_Pars (void) {
+    //sprintf_P(STR, PSTR("(CONF: v%d.%d / %dcm / %ds / max=%d / equ=%d / cont=%d / max=%d)"),
+    sprintf_P(STR, PSTR("(v%d%d%d/%dcm/%ds/maxs(%d,%d)/equ%d/cont%d/fim%d)"),
+                MAJOR, MINOR, REVISION,
+                S.distancia,
+                (int)(S.timeout/1000),
+                (int)S.maxima,
+                (int)S.reves,
+                (int)S.equilibrio,
+                (int)CONT_PCT(1,S.timeout),
+                (int)ABORT_FALLS);
+    Serial.println(STR);
+}
+
 void Serial_Score (void) {
     Serial.println();
     Serial.println(F("-----------------------------------------------"));
@@ -69,18 +83,7 @@ void Serial_Score (void) {
     Serial.println();
     Serial.println(F("-----------------------------------------------"));
     Serial.println();
-
-    //sprintf_P(STR, PSTR("(CONF: v%d.%d / %dcm / %ds / max=%d / equ=%d / cont=%d / max=%d)"),
-    sprintf_P(STR, PSTR("(v%d%d%d/%dcm/%ds/maxs(%d,%d)/equ%d/cont%d/fim%d)"),
-                MAJOR, MINOR, REVISION,
-                S.distancia,
-                (int)(S.timeout/1000),
-                (int)S.maxima,
-                (int)S.reves,
-                (int)S.equilibrio,
-                (int)CONT_PCT(1,S.timeout),
-                (int)ABORT_FALLS);
-    Serial.println(STR);
+    Serial_Pars();
 }
 
 void Serial_Log (void) {

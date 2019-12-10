@@ -7,22 +7,6 @@ enum {
     PC_END     = 5
 };
 
-void PC_Restart (void) {
-    Serial.print(PC_RESTART);           // codigo de reinicio
-    Serial.print(F(";"));
-    Serial.print(S.timeout/1000);       // tempo total de jogo
-    Serial.print(F(";"));
-    Serial.print((int)S.equilibrio);    // equilibrio ligado?
-    Serial.print(F(";"));
-    Serial.print(S.names[0]);           // atleta a esquerda
-    Serial.print(F(";"));
-    Serial.print(S.names[1]);           // atleta a direita
-    Serial.print(F(";"));
-    Serial.print(S.juiz);               // juiz
-    Serial.print(F(";"));
-    Serial.println();
-}
-
 void PC_Seq (void) {
     Serial.print(PC_SEQ);               // codigo de nova sequencia
     Serial.print(F(";"));
@@ -110,4 +94,26 @@ void PC_End (void) {
 }
 
 void PC_Nop (void) {
+}
+
+void PC_Restart (void) {
+    Serial.print(PC_RESTART);           // codigo de reinicio
+    Serial.print(F(";"));
+    Serial.print(S.timeout/1000);       // tempo total de jogo
+    Serial.print(F(";"));
+    Serial.print((int)S.equilibrio);    // equilibrio ligado?
+    Serial.print(F(";"));
+    Serial.print(S.names[0]);           // atleta a esquerda
+    Serial.print(F(";"));
+    Serial.print(S.names[1]);           // atleta a direita
+    Serial.print(F(";"));
+    Serial.print(S.juiz);               // juiz
+    Serial.print(F(";"));
+    Serial_Pars();
+
+    PC_Seq();
+    PC_Hit(0,0,0);
+    PC_Hit(1,0,0);
+    PC_Tick();
+    PC_Fall();
 }
