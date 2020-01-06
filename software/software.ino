@@ -1,6 +1,6 @@
 #define MAJOR    2
-#define MINOR    0
-#define REVISION 2
+#define MINOR    1
+#define REVISION 0
 
 //#define DEBUG
 
@@ -42,7 +42,7 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 
 #define REF_TIMEOUT     300         // 5 mins
 #define REF_BESTS       24
-#define REF_CONT        20          // 2%
+#define REF_CONT        10          // 1%
 #define REF_ABORT       15          // 15s per fall
 
 #define HITS_MAX        650
