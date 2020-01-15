@@ -157,6 +157,6 @@ void PT_All (void) {
     {
         u32 dt = ((u32)36*5*10000)/G.total;
         u32 n  = ((u32)G.time)*100 / dt;
-        G.acum = ((u32)G.total) * n / 10000;
+        G.acum = ((u32)G.total) * n / 100000;
     }
 }
