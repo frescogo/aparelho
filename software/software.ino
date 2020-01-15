@@ -1,6 +1,6 @@
 #define MAJOR    2
-#define MINOR    1
-#define REVISION 1
+#define MINOR    2
+#define REVISION 0
 
 //#define DEBUG
 
@@ -121,6 +121,7 @@ typedef struct {
     s8   ritmo;                       // kmh
 
     u16  total;
+    u16  acum;
     Jog  jogs[2];
 } Game;
 static Game G;

@@ -68,6 +68,8 @@ void PC_Tick (void) {
     Serial.print(F(";"));
     Serial.print(G.total);              // total da dupla
     Serial.print(F(";"));
+    Serial.print(G.acum);               // total da dupla
+    Serial.print(F(";"));
     Serial.print(G.hits);               // total de golpes
     Serial.print(F(";"));
     Serial.print((int)G.ritmo);       // media simples

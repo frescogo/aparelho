@@ -148,7 +148,15 @@ void PT_All (void) {
     u16 avg, min_;
     PT_Equ(&avg,&min_);
 
-    int pct   = CONT_PCT(Falls(), G.time);
-    u32 total = (S.equilibrio ? min_ : avg);
-    G.total   = total * (1000-pct) / 1000;
+    {
+        int pct   = CONT_PCT(Falls(), G.time);
+        u32 total = (S.equilibrio ? min_ : avg);
+        G.total   = total * (1000-pct) / 1000;
+    }
+
+    {
+        u32 dt = ((u32)36*5*10000)/G.total;
+        u32 n  = ((u32)G.time)*100 / dt;
+        G.acum = ((u32)G.total) * n / 10000;
+    }
 }

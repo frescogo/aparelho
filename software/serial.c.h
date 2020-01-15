@@ -25,7 +25,12 @@ void Serial_Score (void) {
     Serial.println(F("-----------------------------------------------"));
     Serial.println();
 
-    Serial.print(F("TOTAL .............. "));
+    Serial.print(F("ACUML .............. "));
+    sprintf_P(STR, PSTR("%4d"), G.acum);
+    Serial.print(STR);
+    Serial.println(F(" pts"));
+
+    Serial.print(F("MEDIA .............. "));
     sprintf_P(STR, PSTR("%02d.%02d"), G.total/100, G.total%100);
     Serial.print(STR);
     Serial.println(F(" pts"));
@@ -41,7 +46,7 @@ void Serial_Score (void) {
     Serial.print(F("Golpes ............. "));
     Serial.println(G.hits);
 
-    Serial.print(F("Média .............. "));
+    Serial.print(F("Ritmo .............. "));
     if (G.time > 5000) {
         Serial.print((int)G.ritmo);
         //Serial.print(F("/"));
