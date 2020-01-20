@@ -198,6 +198,8 @@ void Serial_Log (void) {
     Serial.println(F(" pts"));
 }
 
+void PC_Restart (void);     // assinatura de arquivo nao incluido ainda
+
 int Serial_Check (void) {
     static char CMD[32];
     static int  i = 0;
@@ -251,7 +253,7 @@ _COMPLETE:
         S.maxima = max(50, min(HIT_KMH_MAX, atoi(&CMD[7])));
     } else if (strncmp_P(CMD, PSTR("reves "), 5) == 0) {
         S.reves = atoi(&CMD[5]);
-        if (S.reves != 0) {
+        if (S.reves) {
             S.reves = max(REVES_MIN, min(REVES_MAX, S.reves));
         }
 /*
@@ -291,6 +293,8 @@ OK:;
     PT_All();
     if (S.modo==MODE_CEL) {
         Serial_Score();
+    } else {
+        PC_Restart();
     }
 
     return IN_NONE;

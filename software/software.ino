@@ -1,6 +1,6 @@
 #define MAJOR    2
-#define MINOR    2
-#define REVISION 1
+#define MINOR    3
+#define REVISION 0
 
 //#define DEBUG
 
@@ -63,7 +63,6 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 
 #define NAME_MAX        15
 
-#define REVES_OFF       0
 #define REVES_MIN       180
 #define REVES_MAX       220
 
@@ -77,9 +76,9 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 #define CONT_PCT(f,t)   min(999, f * (((u32)REF_TIMEOUT)*REF_CONT*1000/max(1,t)))
 #define ABORT_FALLS     (S.timeout / REF_ABORT / 1000)
 
-#define MULT_VOLUME     60
+#define MULT_VOLUME     (S.reves ? 60 : 75)
 #define MULT_NORMAL     25
-#define MULT_REVES      15
+#define MULT_REVES      (S.reves ? 15 : 0)
 #define MULT_DIV        (MULT_VOLUME + MULT_NORMAL + MULT_REVES)
 
 static int  STATE;
@@ -272,7 +271,7 @@ void EEPROM_Default (void) {
     S.timeout       = REF_TIMEOUT * ((u32)1000);
     S.equilibrio    = 1;
     S.maxima        = 85;
-    S.reves         = REVES_OFF;
+    S.reves         = 0;
 }
 
 void setup (void) {
@@ -494,7 +493,7 @@ _UNDO:
 
             // sleep inside hit to reach S.reves
             {
-                int sensibilidade = (S.reves == 0) ? REVES_MIN : S.reves;
+                int sensibilidade = (!S.reves) ? REVES_MIN : S.reves;
                 u32 dt_ = millis() - t1;
                 if (sensibilidade > dt_) {
                     delay(sensibilidade-dt_);
