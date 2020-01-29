@@ -89,9 +89,14 @@ static int  STATE;
 static bool IS_BACK;
 static char STR[64];
 
-typedef struct {
-    u8   modo;                  // = MODE_CEL
+typedef enum {
+    MOD_CEL = 0,
+    MOD_PC
+} TMOD;
 
+TMOD MOD;
+
+typedef struct {
     char juiz[NAME_MAX+1];      // = "Juiz"
     char names[2][NAME_MAX+1];  // = { "Atleta ESQ", "Atleta DIR" }
     u32  timeout;               // = 180 * ((u32)1000) ms
@@ -140,11 +145,6 @@ enum {
     IN_RESTART,
     IN_UNDO,
     IN_RESET
-};
-
-enum {
-    MODE_PC,
-    MODE_CEL
 };
 
 int Falls (void) {
@@ -272,7 +272,6 @@ void EEPROM_Save (void) {
 }
 
 void EEPROM_Default (void) {
-    S.modo          = MODE_CEL;
     strcpy(S.juiz,     "?");
     strcpy(S.names[0], "Atleta ESQ");
     strcpy(S.names[1], "Atleta DIR");
@@ -284,11 +283,18 @@ void EEPROM_Default (void) {
 }
 
 void setup (void) {
+    Serial.begin(9600);
+
     pinMode(PIN_CFG,   INPUT_PULLUP);
     pinMode(PIN_LEFT,  INPUT_PULLUP);
     pinMode(PIN_RIGHT, INPUT_PULLUP);
 
-    Serial.begin(9600);
+    delay(2000);
+    if (Serial.available()) {
+        MOD = Serial.read();
+    } else {
+        MOD = MOD_CEL;
+    }
 
     EEPROM_Load();
 }
@@ -308,12 +314,12 @@ u32 alarm (void) {
     }
 }
 
-#define MODE(xxx,yyy)   \
-    switch (S.modo) {   \
-        case MODE_CEL:  \
+#define XMOD(xxx,yyy)   \
+    switch (MOD) {      \
+        case MOD_CEL:   \
             xxx;        \
             break;      \
-        case MODE_PC:   \
+        case MOD_PC:    \
             yyy;        \
             break;      \
     }
@@ -325,7 +331,7 @@ void Desc (u32 now, u32* desc0, bool desconto) {
     if (!desconto || diff>DESC_FOLGA) {     // 5s de folga
         u32 temp = S.descanso + diff/10;
         S.descanso = min(DESC_MAX, temp);   // limita a 65000
-        MODE(CEL_Nop(), PC_Desc());
+        XMOD(CEL_Nop(), PC_Desc());
     }
 }
 
@@ -335,7 +341,7 @@ void loop (void)
     STATE = STATE_IDLE;
     PT_All();
 
-    MODE(CEL_Restart(), PC_Restart());
+    XMOD(CEL_Restart(), PC_Restart());
 
     while (1)
     {
@@ -380,7 +386,7 @@ _UNDO:
                         delay(310);
                         EEPROM_Save();
                         PT_All();
-                        MODE(Serial_Score(), PC_Atualiza());
+                        XMOD(Serial_Score(), PC_Atualiza());
                     }
                 case IN_GO_FALL:
                     goto _BREAK1;
@@ -389,7 +395,7 @@ _UNDO:
 _BREAK1:
 
         u32 desc0 = millis();               // comeca a contar o descanso
-        MODE(Serial_Score(), PC_Nop());
+        XMOD(Serial_Score(), PC_Nop());
 
 _SERVICE:
         tone(PIN_TONE, NOTE_C7, 500);
@@ -436,7 +442,7 @@ _BREAK2:
 
         IS_BACK = false;
 
-        MODE(CEL_Service(got), PC_Hit(1-got,false,0));
+        XMOD(CEL_Service(got), PC_Hit(1-got,false,0));
 
         PT_All();
         delay(HIT_MIN_DT);
@@ -513,7 +519,7 @@ _BREAK2:
             nxt = 1 - got;
 
             PT_All();
-            MODE(CEL_Nop(), PC_Tick());
+            XMOD(CEL_Nop(), PC_Tick());
 
 // TIMEOUT
             if (G.time >= S.timeout) {
@@ -551,10 +557,10 @@ _BREAK2:
             }
 
             if (skipped) {
-                MODE(CEL_Hit(  got,IS_BACK,kmh), PC_Hit(  got,IS_BACK,kmh));
-                MODE(CEL_Hit(1-got,false,  kmh), PC_Hit(1-got,false,  kmh));
+                XMOD(CEL_Hit(  got,IS_BACK,kmh), PC_Hit(  got,IS_BACK,kmh));
+                XMOD(CEL_Hit(1-got,false,  kmh), PC_Hit(1-got,false,  kmh));
             } else {
-                MODE(CEL_Hit(1-got,IS_BACK,kmh), PC_Hit(1-got,IS_BACK,kmh));
+                XMOD(CEL_Hit(1-got,IS_BACK,kmh), PC_Hit(1-got,IS_BACK,kmh));
             }
 
             // sleep inside hit to reach HIT_MIN_DT
@@ -576,8 +582,8 @@ _FALL:
         delay(310);
 
         PT_All();
-        MODE(CEL_Fall(), PC_Fall());
-        MODE(CEL_Nop(),  PC_Tick());
+        XMOD(CEL_Fall(), PC_Fall());
+        XMOD(CEL_Nop(),  PC_Tick());
         EEPROM_Save();
 
         if (Falls() >= ABORT_FALLS) {
@@ -589,8 +595,8 @@ _TIMEOUT:
     STATE = STATE_TIMEOUT;
     tone(PIN_TONE, NOTE_C2, 2000);
     PT_All();
-    MODE(CEL_Nop(), PC_Tick());
-    MODE(CEL_End(), PC_End());
+    XMOD(CEL_Nop(), PC_Tick());
+    XMOD(CEL_End(), PC_End());
     EEPROM_Save();
 
     while (1) {

@@ -226,11 +226,7 @@ int Serial_Check (void) {
 _COMPLETE:
     i = 0;
 
-    if (strncmp_P(CMD, PSTR("modo cel"), 8) == 0) {
-        S.modo = MODE_CEL;
-    } else if (strncmp_P(CMD, PSTR("modo pc"), 7) == 0) {
-        S.modo = MODE_PC;
-    } else if (strncmp_P(CMD, PSTR("restaurar"), 9) == 0) {
+    if (strncmp_P(CMD, PSTR("restaurar"), 9) == 0) {
         return IN_RESET;
     } else if (strncmp_P(CMD, PSTR("reiniciar"), 9) == 0) {
         return IN_RESTART;
@@ -296,7 +292,7 @@ OK:;
     }
     EEPROM_Save();
     PT_All();
-    if (S.modo==MODE_CEL) {
+    if (MOD==MOD_CEL) {
         Serial_Score();
     } else if (restart) {
         PC_Restart();
