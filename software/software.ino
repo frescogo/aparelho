@@ -1,5 +1,5 @@
 #define MAJOR    2
-#define MINOR    3
+#define MINOR    4
 #define REVISION 0
 
 //#define DEBUG
@@ -40,9 +40,9 @@ typedef unsigned long u32;
 
 static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 
-#define REF_TIMEOUT     300         // 5 mins
+#define REF_TIMEOUT     240         // 4 mins
 #define REF_BESTS       24
-#define REF_CONT        10          // 1%
+#define REF_CONT        15          // 1.5%
 #define REF_ABORT       15          // 15s per fall
 
 #define HITS_MAX        650
