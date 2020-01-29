@@ -206,6 +206,7 @@ void PC_Restart (void);     // assinatura de arquivo nao incluido ainda
 int Serial_Check (void) {
     static char CMD[32];
     static int  i = 0;
+    bool restart = false;
 
     char c;
     while (Serial.available()) {
@@ -247,6 +248,7 @@ _COMPLETE:
     } else if (strncmp_P(CMD, PSTR("tempo "), 6) == 0) {
         S.timeout = ((u32) max(10, atoi(&CMD[6]))) * 1000;
     } else if (strncmp_P(CMD, PSTR("distancia "), 5) == 0) {
+        restart = true;
         S.distancia = max(100, min(1000, atoi(&CMD[10])));
     } else if (strncmp_P(CMD, PSTR("equilibrio sim"), 14) == 0) {
         S.equilibrio = 1;
@@ -296,7 +298,7 @@ OK:;
     PT_All();
     if (S.modo==MODE_CEL) {
         Serial_Score();
-    } else {
+    } else if (restart) {
         PC_Restart();
     }
 
