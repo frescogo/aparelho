@@ -26,8 +26,7 @@ void Serial_Score (void) {
     Serial.println();
 
     Serial.print(F("ACUML .............. "));
-    sprintf_P(STR, PSTR("%4d"), G.acum);
-    Serial.print(STR);
+    Serial.print(G.acum);
     Serial.println(F(" pts"));
 
     Serial.print(F("MEDIA .............. "));
@@ -39,6 +38,10 @@ void Serial_Score (void) {
     int restante = (G.time > S.timeout ? 0 : (int)ceil((S.timeout-G.time)/(float)1000));
     sprintf_P(STR, PSTR("%02d:%02d"), restante/60, restante%60);
     Serial.println(STR);
+
+    Serial.print(F("Descanso ........... "));
+    Serial.print(S.descanso/100);
+    Serial.println("s");
 
     Serial.print(F("Quedas ............. "));
     Serial.println(Falls());

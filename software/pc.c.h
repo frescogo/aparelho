@@ -4,13 +4,24 @@ enum {
     PC_HIT     = 2,
     PC_TICK    = 3,
     PC_FALL    = 4,
-    PC_END     = 5
+    PC_END     = 5,
+    PC_DESC    = 6
 };
+
+void PC_Desc (void) {
+    Serial.print(PC_DESC);              // codigo de nova sequencia
+    Serial.print(F(";"));
+    Serial.print(S.descanso/100);       // tempo de descanso em s
+    Serial.print(F(";"));
+    Serial.println();
+}
 
 void PC_Seq (void) {
     Serial.print(PC_SEQ);               // codigo de nova sequencia
     Serial.print(F(";"));
     Serial.print(G.time/1000);          // tempo jogado em ms
+    Serial.print(F(";"));
+    Serial.print(S.descanso/100);       // tempo de descanso em s
     Serial.print(F(";"));
     Serial.print(Falls());              // total de quedas
     Serial.print(F(";"));

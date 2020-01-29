@@ -63,6 +63,9 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 
 #define NAME_MAX        15
 
+#define DESC_MAX        65000
+#define DESC_FOLGA      5000
+
 #define REVES_MIN       180
 #define REVES_MAX       220
 
@@ -96,6 +99,7 @@ typedef struct {
     u8   maxima;                // = 85 kmh
     u16  reves;                 // = 180  (tempo minimo de segurar para o back)
 
+    u16  descanso;              // cs (ms*10) (até 650s de descanso)
     u16  hit;
     s8   dts[HITS_MAX];         // cs (ms*10)
 } Save;
@@ -182,7 +186,7 @@ void Sound (s8 kmh, bool is_back) {
     }
 }
 
-int Await_Input (bool serial) {
+int Await_Input (bool serial, bool hold) {
     static u32 old;
     static int pressed = 0;
     while (1) {
@@ -233,6 +237,10 @@ int Await_Input (bool serial) {
                 old = now;
                 return IN_RESET;
             }
+        }
+
+        if (!hold) {
+            return IN_NONE;
         }
     }
 }
@@ -309,6 +317,17 @@ u32 alarm (void) {
             break;      \
     }
 
+void Desc (u32 now, u32* desc0, bool desconto) {
+    u32 diff = now - *desc0;
+    *desc0 = now;
+
+    if (!desconto || diff>DESC_FOLGA) {     // 5s de folga
+        u32 temp = S.descanso + diff/10;
+        S.descanso = min(DESC_MAX, temp);   // limita a 65000
+        MODE(CEL_Nop(), PC_Desc());
+    }
+}
+
 void loop (void)
 {
 // RESTART
@@ -331,68 +350,80 @@ void loop (void)
 
         int got;
         while (1) {
-            got = Await_Input(true);
-            if (got == IN_RESET) {
-                EEPROM_Default();
-                goto _RESTART;
-            } else if (got == IN_RESTART) {
-                goto _RESTART;
-            } else if (got==IN_UNDO && S.hit>0) {
+            got = Await_Input(true,true);
+            switch (got) {
+                case IN_RESET:
+                    EEPROM_Default();
+                    goto _RESTART;
+                case IN_RESTART:
+                    goto _RESTART;
+                case IN_UNDO:
+                    if (S.hit > 0) {
 _UNDO:
-                while (1) {
-                    S.hit -= 1;
-                    if (S.hit == 0) {
-                        break;
-                    } else if (S.dts[S.hit] == HIT_SERV) {
-                        if (S.dts[S.hit-1] == HIT_NONE) {
+                        while (1) {
                             S.hit -= 1;
+                            if (S.hit == 0) {
+                                break;
+                            } else if (S.dts[S.hit] == HIT_SERV) {
+                                if (S.dts[S.hit-1] == HIT_NONE) {
+                                    S.hit -= 1;
+                                }
+                                break;
+                            }
                         }
-                        break;
+                        tone(PIN_TONE, NOTE_C2, 100);
+                        delay(110);
+                        tone(PIN_TONE, NOTE_C3, 100);
+                        delay(110);
+                        tone(PIN_TONE, NOTE_C4, 300);
+                        delay(310);
+                        EEPROM_Save();
+                        PT_All();
+                        MODE(Serial_Score(), PC_Atualiza());
                     }
-                }
-                tone(PIN_TONE, NOTE_C2, 100);
-                delay(110);
-                tone(PIN_TONE, NOTE_C3, 100);
-                delay(110);
-                tone(PIN_TONE, NOTE_C4, 300);
-                delay(310);
-                EEPROM_Save();
-                PT_All();
-                MODE(Serial_Score(), PC_Atualiza());
-
-/* No TIMEOUT outside playing: prevents falls miscount.
-            } else if (got == IN_TIMEOUT) {
-                goto _TIMEOUT;
-*/
-            } else if (got == IN_GO_FALL) {
-                break;
+                case IN_GO_FALL:
+                    goto _BREAK1;
             }
         }
-        tone(PIN_TONE, NOTE_C7, 500);
+_BREAK1:
+
+        u32 desc0 = millis();               // comeca a contar o descanso
         MODE(Serial_Score(), PC_Nop());
+
+_SERVICE:
+        tone(PIN_TONE, NOTE_C7, 500);
 
 // SERVICE
         while (1) {
-            got = Await_Input(true);
-            if (got == IN_RESET) {
-                EEPROM_Default();
-                goto _RESTART;
-            } else if (got == IN_RESTART) {
-                goto _RESTART;
-/* No TIMEOUT outside playing: prevents falls miscount.
-            } else if (got == IN_TIMEOUT) {
-                goto _TIMEOUT;
-*/
-/* No FALL just after service: prevents double falls.
-            } else if (got == IN_GO_FALL) {
-                goto _FALL;
-*/
-            } else if (got==IN_LEFT || got==IN_RIGHT) {
-                break;
+            got = Await_Input(true,false);
+            switch (got) {
+                case IN_RESET:
+                    EEPROM_Default();
+                    goto _RESTART;
+                case IN_RESTART:
+                    goto _RESTART;
+                case IN_LEFT:
+                case IN_RIGHT:
+                    goto _BREAK2;
+
+                case IN_GO_FALL:
+                    Desc(millis(), &desc0, false);
+                    goto _SERVICE;
+
+                case IN_NONE:
+                    u32 now = millis();
+                    if (now - desc0 >= 10000) {
+                        Desc(now, &desc0, true);
+                        tone(PIN_TONE, NOTE_C7, 500);
+                    }
+                    break;
             }
         }
+_BREAK2:
 
         u32 t0 = millis();
+
+        Desc(t0, &desc0, true);
 
         if (got != S.hit%2) {
             S.dts[S.hit++] = HIT_NONE;
@@ -420,7 +451,7 @@ _UNDO:
             u32 t1;
             int dt;
             while (1) {
-                got = Await_Input(true);
+                got = Await_Input(true,true);
                 if (got == IN_RESET) {
                     EEPROM_Default();
                     goto _RESTART;
@@ -562,7 +593,7 @@ _TIMEOUT:
     EEPROM_Save();
 
     while (1) {
-        int got = Await_Input(true);
+        int got = Await_Input(true,true);
         if (got == IN_RESET) {
             EEPROM_Default();
             goto _RESTART;
@@ -580,5 +611,6 @@ _TIMEOUT:
 _RESTART:
     tone(PIN_TONE, NOTE_C5, 2000);
     S.hit = 0;
+    S.descanso = 0;
     EEPROM_Save();
 }
