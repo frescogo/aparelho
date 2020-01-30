@@ -494,7 +494,9 @@ _BREAK2:
             s8 kmh = min(kmh_, HIT_KMH_MAX);
             kmh = min(kmh_, S.maxima);
 
-            bool is_back = IS_BACK && (kmh >= G.kmhs[S.hit-1]*REV_PCT); // 10% mais forte que golpe anterior
+            // nao pode ser "skipped" (eh uma maneira de corrigir um erro de marcacao)
+            // 10% mais forte que golpe anterior
+            bool is_back = IS_BACK && !skipped && (kmh >= G.kmhs[S.hit-1]*REV_PCT);
 
             u8 al_now = 0;
             if (G.time+dt*10 > alarm()) {
