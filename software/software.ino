@@ -330,7 +330,7 @@ void Desc (u32 now, u32* desc0, bool desconto) {
     *desc0 = now;
 
     if (!desconto || diff>DESC_FOLGA) {     // 5s de folga
-        u32 temp = S.descanso + diff/10/2;  // tira metade da folga
+        u32 temp = S.descanso + diff/10;
         S.descanso = min(DESC_MAX, temp);   // limita a 65000
         XMOD(CEL_Nop(), PC_Desc());
     }
