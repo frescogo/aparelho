@@ -40,10 +40,11 @@ typedef unsigned long u32;
 
 static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 
-#define REF_TIMEOUT     240         // 4 mins
-#define REF_BESTS       20
+#define DEF_TIMEOUT     240         // 4 mins
+#define REF_TIMEOUT     300         // 5 mins
+#define REF_BESTS       25
 #define REF_REVES       3/5         // CUIDADO: sem parenteses
-#define REF_CONT        15          // 1.5%
+#define REF_CONT        12          // 1.2%
 #define REF_ABORT       15          // 15s per fall
 
 #define HITS_MAX        650
@@ -276,7 +277,7 @@ void EEPROM_Default (void) {
     strcpy(S.names[0], "Atleta ESQ");
     strcpy(S.names[1], "Atleta DIR");
     S.distancia     = 750;
-    S.timeout       = REF_TIMEOUT * ((u32)1000);
+    S.timeout       = DEF_TIMEOUT * ((u32)1000);
     S.equilibrio    = 1;
     S.maxima        = 85;
     S.reves         = 0;
