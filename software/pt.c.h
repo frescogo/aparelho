@@ -157,6 +157,7 @@ void PT_All (void) {
     {
         u32 dt = ((u32)36*5*10000)/G.total;
         u32 n  = ((u32)G.time)*100 / dt;
-        G.acum = ((u32)G.total) * n / 100000;
+        u32 to = (S.hit >= HITS_MAX-5) ? G.time : S.timeout;
+        G.acum = ((u32)G.total) * n / 100 * REF_TIMEOUT / to;
     }
 }
