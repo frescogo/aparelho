@@ -188,17 +188,18 @@ void Serial_Log (void) {
     PT_Equ(&avg,&min_);
 
     u16 equ = (!S.equilibrio ? 0 : avg - min_);
+    u16 pct = CONT_PCT(Falls(),G.time);
 
     sprintf_P(STR, PSTR("Media ........... %02d.%02d"), avg/100, avg%100);
     Serial.print(STR);
-    Serial.println(F(" pts"));
-    sprintf_P(STR, PSTR("Equilibrio ...... %02d.%02d (-)"), equ/100, equ%100);
+    Serial.println(F("  pts"));
+    sprintf_P(STR, PSTR("Equilibrio ...... %02d.%02d  (-)"), equ/100, equ%100);
     Serial.println(STR);
-    sprintf_P(STR, PSTR("Quedas (%02d) .....   %02d%% (-)"), Falls(), CONT_PCT(Falls(),G.time)/10);
+    sprintf_P(STR, PSTR("Quedas (%02d) ..... %02d.%02d%% (-)"), Falls(), pct/100,pct%100);
     Serial.println(STR);
     sprintf_P(STR, PSTR("TOTAL ........... %02d.%02d"), G.total/100, G.total%100);
     Serial.print(STR);
-    Serial.println(F(" pts"));
+    Serial.println(F("  pts"));
 }
 
 void PC_Restart (void);     // assinatura de arquivo nao incluido ainda

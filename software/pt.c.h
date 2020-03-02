@@ -151,13 +151,12 @@ void PT_All (void) {
     {
         int pct   = CONT_PCT(Falls(), G.time);
         u32 total = (S.equilibrio ? min_ : avg);
-        G.total   = total * (1000-pct) / 1000;
+        G.total   = total * (10000-pct) / 10000;
     }
 
     {
-        u32 dt = ((u32)36*5*10000)/G.total;
-        u32 n  = ((u32)G.time)*100 / dt;
-        u32 to = (S.hit >= HITS_MAX-5) ? G.time : S.timeout;
-        G.acum = ((u32)G.total) * n / 100 * REF_TIMEOUT / to;
+        u32 ti = ((STATE != STATE_TIMEOUT) ? G.time : S.timeout) / 100;
+        u32 to = ((S.hit >= HITS_MAX-5)    ? G.time : S.timeout) / 100;
+        G.acum = ((u32)G.total)*G.total / (36*5) * ti / to * REF_TIMEOUT / 10000;
     }
 }

@@ -1,6 +1,6 @@
 #define MAJOR    2
 #define MINOR    4
-#define REVISION 0
+#define REVISION 1
 
 //#define DEBUG
 
@@ -44,7 +44,7 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 #define REF_TIMEOUT     300         // 5 mins
 #define REF_BESTS       25
 #define REF_REVES       3/5         // CUIDADO: sem parenteses
-#define REF_CONT        12          // 1.2%
+#define REF_CONT        120         // 1.2%
 #define REF_ABORT       15          // 15s per fall
 
 #define HITS_MAX        650
@@ -78,7 +78,7 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 #define EQU_PCT         105/100 // do not use parenthesis (multiply before division)
 //#define CONT_MAX        (REF_CONT * REF_TIMEOUT / REF_ABORT)    // max PCT to loose (40%)
 //#define CONT_PCT(f,t)   min(CONT_MAX, f * (((u32)REF_TIMEOUT)*REF_CONT*1000/max(1,t)))
-#define CONT_PCT(f,t)   min(999, f * (((u32)REF_TIMEOUT)*REF_CONT*1000/max(1,t)))
+#define CONT_PCT(f,t)   min(9999, f * (((u32)REF_TIMEOUT)*REF_CONT*1000/max(1,t)))
 #define ABORT_FALLS     (S.timeout / REF_ABORT / 1000)
 
 #define MULT_VOLUME     (S.reves ? 60 : 75)
