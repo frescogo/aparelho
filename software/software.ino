@@ -43,7 +43,7 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 #define DEF_TIMEOUT     240         // 4 mins
 #define REF_TIMEOUT     300         // 5 mins
 #define REF_BESTS       25
-#define REF_REVES       3/5         // CUIDADO: sem parenteses
+#define REF_REVES       1/5         // CUIDADO: sem parenteses
 #define REF_CONT        120         // 1.2%
 #define REF_ABORT       15          // 15s per fall
 
@@ -54,6 +54,7 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 #define HIT_MIN_DT      235         // minimum time between two hits (125kmh)
 //#define HIT_KMH_MAX   125         // to fit in s8 (changed to u8, but lets keep 125)
 #define HIT_KMH_MAX     99          // safe value to avoid errors
+#define HIT_KMH_50      50
 
 #define HIT_MARK        0
 #define HIT_NONE        1
@@ -81,9 +82,9 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 #define CONT_PCT(f,t)   min(9999, f * (((u32)REF_TIMEOUT)*REF_CONT*1000/max(1,t)))
 #define ABORT_FALLS     (S.timeout / REF_ABORT / 1000)
 
-#define MULT_VOLUME     (S.reves ? 60 : 75)
-#define MULT_NORMAL     25
-#define MULT_REVES      (S.reves ? 15 : 0)
+#define MULT_VOLUME     0
+#define MULT_NORMAL     (S.reves ? 80 : 100)
+#define MULT_REVES      (S.reves ? 20 :   0)
 #define MULT_DIV        (MULT_VOLUME + MULT_NORMAL + MULT_REVES)
 
 static int  STATE;
@@ -153,38 +154,22 @@ int Falls (void) {
                         // after fall
 }
 
+// tom dos golpes            50-      50-60    60-70    70-80    80+
+static const int NOTES[] = { NOTE_E3, NOTE_E5, NOTE_G5, NOTE_B5, NOTE_D6 };
+
 #include "pt.c.h"
 #include "serial.c.h"
 #include "xcel.c.h"
 #include "pc.c.h"
 
 void Sound (s8 kmh, bool is_back) {
-    if (is_back) {
-        tone(PIN_TONE, NOTE_C4, 20);
+    int ton = NOTES[min(max(0,kmh/10-4), 4)];
+    if (is_back && kmh>=HIT_KMH_50) {
+        tone(PIN_TONE, ton, 20);
         delay(35);
-        tone(PIN_TONE, NOTE_C4, 20);
-    } else if (kmh < 40) {
-        tone(PIN_TONE, NOTE_C5, 50);
-    } else if (kmh < 50) {
-        tone(PIN_TONE, NOTE_E5, 50);
-    } else if (kmh < 60) {
-        tone(PIN_TONE, NOTE_G5, 50);
-    } else if (kmh < 70) {
-        tone(PIN_TONE, NOTE_C5, 20);
-        delay(35);
-        tone(PIN_TONE, NOTE_C5, 20);
-    } else if (kmh < 80) {
-        tone(PIN_TONE, NOTE_E5, 20);
-        delay(35);
-        tone(PIN_TONE, NOTE_E5, 20);
-    } else if (kmh < 90) {
-        tone(PIN_TONE, NOTE_G5, 20);
-        delay(35);
-        tone(PIN_TONE, NOTE_G5, 20);
+        tone(PIN_TONE, ton, 20);
     } else {
-        tone(PIN_TONE, NOTE_C6, 20);
-        delay(35);
-        tone(PIN_TONE, NOTE_C6, 20);
+        tone(PIN_TONE, ton, 50);
     }
 }
 
@@ -439,7 +424,7 @@ _BREAK2:
         S.dts[S.hit++] = HIT_SERV;
         STATE = STATE_PLAYING;
 
-        tone(PIN_TONE, NOTE_C5, 50);
+        tone(PIN_TONE, NOTES[0], 50);
 
         IS_BACK = false;
 
