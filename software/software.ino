@@ -1,6 +1,6 @@
-#define MAJOR    2
-#define MINOR    4
-#define REVISION 1
+#define MAJOR    3
+#define MINOR    0
+#define REVISION 0
 
 //#define DEBUG
 
@@ -43,13 +43,13 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 #define DEF_TIMEOUT     240         // 4 mins
 #define REF_TIMEOUT     300         // 5 mins
 #define REF_BESTS       100
-#define REF_REVES       1/5         // CUIDADO: sem parenteses
+#define REF_REVES       20          // 20%
 #define REF_CONT        120         // 1.2%
 #define REF_ABORT       15          // 15s per fall
 
 #define HITS_MAX        700
 #define HITS_NRM        (max(1, min(REF_BESTS, (S.timeout*REF_BESTS/REF_TIMEOUT/1000))))
-#define HITS_REV        (max(1, HITS_NRM*REF_REVES))
+#define HITS_REV        (max(1, HITS_NRM*REF_REVES/100))
 
 #define HIT_MIN_DT      235         // minimum time between two hits (125kmh)
 //#define HIT_KMH_MAX   125         // to fit in s8 (changed to u8, but lets keep 125)
@@ -82,10 +82,8 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 #define CONT_PCT(f,t)   min(9999, f * (((u32)REF_TIMEOUT)*REF_CONT*1000/max(1,t)))
 #define ABORT_FALLS     (S.timeout / REF_ABORT / 1000)
 
-#define MULT_VOLUME     0
-#define MULT_NORMAL     (S.reves ? 80 : 100)
-#define MULT_REVES      (S.reves ? 20 :   0)
-#define MULT_DIV        (MULT_VOLUME + MULT_NORMAL + MULT_REVES)
+#define MULT_NRM        (S.reves ? (100-REF_REVES) : 100)
+#define MULT_REV        (S.reves ? (    REF_REVES) :   0)
 
 static int  STATE;
 static bool IS_BACK;
@@ -113,24 +111,34 @@ typedef struct {
 } Save;
 static Save S;
 
+enum {
+    LADO_NRM = 0,
+    LADO_REV,
+    LADO_NRM_REV
+};
+
 typedef struct {
-    u16  total;                    // volume+reves+normal (x100)
-    u16  volume;                   // avg2/avg2 (x100)
-    u16  reves;                    // avg (x100)
-    u16  normal;                   // avg (x100)
-    //u8   max_;                     // kmh
+    u8  golpes;
+    u8  minima;
+    u8  maxima;
+    u8  media2;
+    u16 pontos;
+} Lado;
+
+// TODO: avg2, total/reves/normal->tot/rev/nrm
+typedef struct {
+    u16  pontos;                    // reves+normal (x100)
+    Lado lados[LADO_NRM_REV];
 } Jog;
 
 typedef struct {
     // calculated when required
-    s8   bests[2][2][REF_BESTS];      // kmh (max 125kmh/h)
     u32  time;                        // ms (total time)
     u16  hits;
     u8   servs;
     s8   ritmo;                       // kmh
 
-    u16  total;
-    u16  acum;
+    u16  pontos;
     Jog  jogs[2];
 } Game;
 static Game G;

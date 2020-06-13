@@ -25,12 +25,8 @@ void Serial_Score (void) {
     Serial.println(F("-----------------------------------------------"));
     Serial.println();
 
-    Serial.print(F("ACUML .............. "));
-    Serial.print(G.acum);
-    Serial.println(F(" pts"));
-
-    Serial.print(F("MEDIA .............. "));
-    sprintf_P(STR, PSTR("%02d.%02d"), G.total/100, G.total%100);
+    Serial.print(F("PONTOS ............. "));
+    sprintf_P(STR, PSTR("%04d"), G.pontos);
     Serial.print(STR);
     Serial.println(F(" pts"));
 
@@ -69,22 +65,25 @@ void Serial_Score (void) {
 
         sprintf_P(STR, PSTR("%10s: "), S.names[i]);
         Serial.print(STR);
-        sprintf_P(STR, PSTR("%02d.%02d pts "), G.jogs[i].total/100, G.jogs[i].total%100);
-        Serial.print(STR);
-        sprintf_P(STR, PSTR("(%02d.%02d vol / %02d.%02d nrm / %02d.%02d rev)"),
-            G.jogs[i].volume/100, G.jogs[i].volume%100,
-            G.jogs[i].normal/100, G.jogs[i].normal%100,
-            G.jogs[i].reves /100, G.jogs[i].reves %100);
+        sprintf_P(STR, PSTR("%4d pontos "), G.jogs[i].pontos);
         Serial.println(STR);
 
-        for (int j=0; j<2; j++) {
-            Serial.print( (j==0) ? F(" rev ") : F(" nrm ") );
-            Serial.print(F(" [ "));
-            for (int k=0; k<REF_BESTS; k++) {
-                sprintf_P(STR, PSTR("%02d "), (int)G.bests[i][j][k]);
-                Serial.print(STR);
+        for (int j=0; j<LADO_NRM_REV; j++) {
+            int pct, tot;
+            Serial.print(F("   --> "));
+            if (j == LADO_NRM) {
+                pct = MULT_NRM;
+                tot = HITS_NRM;
+                Serial.print(F("nrm"));
+            } else {
+                pct = MULT_REV;
+                tot = HITS_REV;
+                Serial.print(F("rev"));
             }
-            Serial.println(F("]"));
+            Lado* lado = &G.jogs[i].lados[j];
+            sprintf_P(STR, PSTR(": %4d pontos  (%3d%%)  (golpes: %3d/%3d, media: %2d, min: %2d, max: %2d)"),
+                lado->pontos, pct, lado->golpes, tot, lado->media2, lado->minima, lado->maxima);
+            Serial.println(STR);
         }
     }
 
@@ -169,14 +168,12 @@ void Serial_Log (void) {
     Serial.println(F("-----------------------------------------------"));
     Serial.println();
 
-    Serial.println(F("    Atleta   |    Vol     Nrm     Rev    |     Total"));
+    Serial.println(F("    Atleta   |    Nrm    Rev    |     Total"));
     for (int i=0; i<2; i++) {
-        sprintf_P(STR, PSTR("%10s   |   %02d.%02d   %02d.%02d   %02d.%02d   |   %02d.%02d pts"),
+        sprintf_P(STR, PSTR("%10s   |   %4d   %4d   |   %04d pts"),
             S.names[i],
-            G.jogs[i].volume/100, G.jogs[i].volume%100,
-            G.jogs[i].normal/100, G.jogs[i].normal%100,
-            G.jogs[i].reves /100, G.jogs[i].reves %100,
-            G.jogs[i].total /100, G.jogs[i].total %100);
+            G.jogs[i].lados[LADO_NRM].pontos, G.jogs[i].lados[LADO_REV].pontos,
+            G.jogs[i].pontos);
         Serial.println(STR);
     }
 
@@ -197,7 +194,7 @@ void Serial_Log (void) {
     Serial.println(STR);
     sprintf_P(STR, PSTR("Quedas (%02d) ..... %02d.%02d%% (-)"), Falls(), pct/100,pct%100);
     Serial.println(STR);
-    sprintf_P(STR, PSTR("TOTAL ........... %02d.%02d"), G.total/100, G.total%100);
+    sprintf_P(STR, PSTR("TOTAL ........... %04d"), G.pontos);
     Serial.print(STR);
     Serial.println(F("  pts"));
 }

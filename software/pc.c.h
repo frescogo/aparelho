@@ -35,18 +35,18 @@ void PC_Seq (void) {
 }
 
 void PC_Player (int I) {
-    Serial.print(G.jogs[I].total);      // pontuacao
+    Serial.print(G.jogs[I].pontos);      // pontuacao
     Serial.print(F(";"));
     Serial.print(PT_Behind() == I ? 1 : 0);   // 1=atras | 0=ok
     Serial.print(F(";"));
     //Serial.print(G.max_[I]);          // maior velocidade
     //Serial.print(F(";"));
 
-    Serial.print(G.jogs[I].volume);     // volume
+    Serial.print(9999);                 // volume // TODO-remove
     Serial.print(F(";"));
-    Serial.print(G.jogs[I].normal);     // media normal
+    Serial.print(G.jogs[I].lados[LADO_NRM].pontos); // media normal
     Serial.print(F(";"));
-    Serial.print(G.jogs[I].reves);      // media de revez
+    Serial.print(G.jogs[I].lados[LADO_REV].pontos); // media de revez
     Serial.print(F(";"));
 
     //Serial.print(normal->tot1);     // total normais
@@ -77,9 +77,9 @@ void PC_Tick (void) {
     Serial.print(F(";"));
     Serial.print(G.time/1000);          // tempo jogado em ms
     Serial.print(F(";"));
-    Serial.print(G.total);              // total da dupla
+    Serial.print(G.pontos);             // total da dupla
     Serial.print(F(";"));
-    Serial.print(G.acum);               // total da dupla
+    Serial.print(9999);                 // total da dupla // TODO-remove
     Serial.print(F(";"));
     Serial.print(G.hits);               // total de golpes
     Serial.print(F(";"));
