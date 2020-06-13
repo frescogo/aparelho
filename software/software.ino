@@ -42,12 +42,12 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 
 #define DEF_TIMEOUT     240         // 4 mins
 #define REF_TIMEOUT     300         // 5 mins
-#define REF_BESTS       25
+#define REF_BESTS       100
 #define REF_REVES       1/5         // CUIDADO: sem parenteses
 #define REF_CONT        120         // 1.2%
 #define REF_ABORT       15          // 15s per fall
 
-#define HITS_MAX        650
+#define HITS_MAX        700
 #define HITS_NRM        (max(1, min(REF_BESTS, (S.timeout*REF_BESTS/REF_TIMEOUT/1000))))
 #define HITS_REV        (max(1, HITS_NRM*REF_REVES))
 
@@ -122,9 +122,6 @@ typedef struct {
 } Jog;
 
 typedef struct {
-    // needed on EEPROM_Load
-    u8   kmhs[HITS_MAX];              // kmh (max 125km/h)
-
     // calculated when required
     s8   bests[2][2][REF_BESTS];      // kmh (max 125kmh/h)
     u32  time;                        // ms (total time)
@@ -232,6 +229,16 @@ int Await_Input (bool serial, bool hold) {
     }
 }
 
+u8 KMH (int i) {
+    s8 dt = S.dts[i];
+    dt = (dt > 0) ? dt : -dt;
+    u32 kmh_ = ((u32)36) * S.distancia / (dt*10);
+               // prevents overflow
+    u8 kmh = min(kmh_, HIT_KMH_MAX);
+       kmh = min(kmh, S.maxima);
+    return kmh;
+}
+
 void EEPROM_Load (void) {
     for (int i=0; i<sizeof(Save); i++) {
         ((byte*)&S)[i] = EEPROM[i];
@@ -239,16 +246,6 @@ void EEPROM_Load (void) {
     S.hit = min(S.hit, HITS_MAX);
     S.names[0][NAME_MAX] = '\0';
     S.names[1][NAME_MAX] = '\0';
-
-    for (int i=0; i<S.hit; i++) {
-        s8 dt = S.dts[i];
-        dt = (dt > 0) ? dt : -dt;
-
-        u32 kmh_ = ((u32)36) * S.distancia / (dt*10);
-                   // prevents overflow
-        G.kmhs[i] = min(kmh_, HIT_KMH_MAX);
-        G.kmhs[i] = min(G.kmhs[i], S.maxima);
-    }
 }
 
 void EEPROM_Save (void) {
@@ -482,7 +479,7 @@ _BREAK2:
 
             // nao pode ser "skipped" (eh uma maneira de corrigir um erro de marcacao)
             // 10% mais forte que golpe anterior
-            bool is_back = IS_BACK && !skipped && (kmh >= G.kmhs[S.hit-1]*REV_PCT);
+            bool is_back = IS_BACK && !skipped && (kmh >= KMH(S.hit-1)*REV_PCT);
 
             u8 al_now = 0;
             if (G.time+dt*10 > alarm()) {
@@ -497,11 +494,9 @@ _BREAK2:
             } else {
                 S.dts[S.hit] = dt;
             }
-            G.kmhs[S.hit] = kmh;
             S.hit++;
             if (skipped) {
                 S.dts[S.hit]  = dt;
-                G.kmhs[S.hit] = kmh;
                 S.hit++;
             }
             nxt = 1 - got;

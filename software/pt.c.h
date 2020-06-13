@@ -68,7 +68,7 @@ void PT_All (void) {
     for (int i=0 ; i<S.hit ; i++) {
     //for (int i=0 ; i<600 ; i++) {
         s8 dt  = S.dts[i];
-        s8 kmh = G.kmhs[i];
+        s8 kmh = KMH(i);
 
         if (dt == HIT_SERV) {
             G.servs++;

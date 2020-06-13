@@ -103,7 +103,7 @@ void Serial_Log (void) {
     //u32 ps[2] = {0,0};
     for (int i=0 ; i<S.hit ; i++) {
         s8  dt  = S.dts[i];
-        u8  kmh = G.kmhs[i];
+        u8  kmh = KMH(i);
 
         if (dt == HIT_SERV) {
             ball = ball + 1;
