@@ -26,9 +26,9 @@ void Serial_Score (void) {
     Serial.println();
 
     Serial.print(F("PONTOS ............. "));
-    sprintf_P(STR, PSTR("%04d"), G.pontos);
+    sprintf_P(STR, PSTR("%4d"), G.pontos);
     Serial.print(STR);
-    Serial.println(F(" pts"));
+    Serial.println(F(" pontos"));
 
     Serial.print(F("Tempo Restante ..... "));
     int restante = (G.time > S.timeout ? 0 : (int)ceil((S.timeout-G.time)/(float)1000));
@@ -170,7 +170,7 @@ void Serial_Log (void) {
 
     Serial.println(F("    Atleta   |    Nrm    Rev    |     Total"));
     for (int i=0; i<2; i++) {
-        sprintf_P(STR, PSTR("%10s   |   %4d   %4d   |   %04d pts"),
+        sprintf_P(STR, PSTR("%10s   |   %4d   %4d   |   %04d pontos"),
             S.names[i],
             G.jogs[i].lados[LADO_NRM].pontos, G.jogs[i].lados[LADO_REV].pontos,
             G.jogs[i].pontos);
@@ -189,14 +189,14 @@ void Serial_Log (void) {
 
     sprintf_P(STR, PSTR("Media ........... %02d.%02d"), avg/100, avg%100);
     Serial.print(STR);
-    Serial.println(F("  pts"));
+    Serial.println(F("  pontos"));
     sprintf_P(STR, PSTR("Equilibrio ...... %02d.%02d  (-)"), equ/100, equ%100);
     Serial.println(STR);
     sprintf_P(STR, PSTR("Quedas (%02d) ..... %02d.%02d%% (-)"), Falls(), pct/100,pct%100);
     Serial.println(STR);
     sprintf_P(STR, PSTR("TOTAL ........... %04d"), G.pontos);
     Serial.print(STR);
-    Serial.println(F("  pts"));
+    Serial.println(F("  pontos"));
 }
 
 void PC_Restart (void);     // assinatura de arquivo nao incluido ainda

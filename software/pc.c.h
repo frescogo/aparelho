@@ -42,21 +42,20 @@ void PC_Player (int I) {
     //Serial.print(G.max_[I]);          // maior velocidade
     //Serial.print(F(";"));
 
-    Serial.print(9999);                 // volume // TODO-remove
-    Serial.print(F(";"));
-    Serial.print(G.jogs[I].lados[LADO_NRM].pontos); // media normal
-    Serial.print(F(";"));
-    Serial.print(G.jogs[I].lados[LADO_REV].pontos); // media de revez
-    Serial.print(F(";"));
-
-    //Serial.print(normal->tot1);     // total normais
-    //Serial.print(F(";"));
-    //Serial.print(G.normal[I].max_);   // maxima normal
-    //Serial.print(F(";"));
-    //Serial.print(reves->tot2);  // total de revezes
-    //Serial.print(F(";"));
-    //Serial.print(G.reves[I].max_);    // maxima de revez
-    //Serial.print(F(";"));
+    for (int i=0; i<LADO_NRM_REV; i++) {
+        Serial.print(G.jogs[I].lados[LADO_NRM].pontos);
+        Serial.print(F(";"));
+        Serial.print(G.jogs[I].lados[LADO_NRM].golpes);
+        Serial.print(F(";"));
+        Serial.print((i==LADO_NRM) ? HITS_NRM : HITS_REV);
+        Serial.print(F(";"));
+        Serial.print(G.jogs[I].lados[LADO_NRM].media2);
+        Serial.print(F(";"));
+        Serial.print(G.jogs[I].lados[LADO_NRM].minima);
+        Serial.print(F(";"));
+        Serial.print(G.jogs[I].lados[LADO_NRM].maxima);
+        Serial.print(F(";"));
+    }
 }
 
 void PC_Hit (int player, bool is_back, int kmh) {
