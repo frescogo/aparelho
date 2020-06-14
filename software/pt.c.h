@@ -57,43 +57,45 @@ void PT_All (void) {
             G.servs++;
         }
 
-        if (dt==HIT_NONE || dt==HIT_SERV || kmh<HIT_KMH_50) {
+        if (dt==HIT_NONE || dt==HIT_SERV) {
+            continue;
+        }
+
+        G.time += (dt>0 ? dt : -dt);
+
+        if (kmh < HIT_KMH_50) {
             continue;
         }
 
         if (i==S.hit-1 || S.dts[i+1]==HIT_NONE || S.dts[i+1]==HIT_SERV) {
-            // ignore last hit
+            continue; // ignore last hit
         }
-        else
-        {
-            G.hits++;
 
-            int player = 1 - (i%2);
+        G.hits++;
 
-            // bests
-            s8* vec = bests[player][ dt<0 && S.reves ];
+        int player = 1 - (i%2);
+
+        // bests
+        s8* vec = bests[player][ dt<0 && S.reves ];
+        for (int j=0; j<HITS_NRM; j++) {
+            if (kmh > vec[j]) {
+                for (int k=HITS_NRM-1; k>j; k--) {
+                    vec[k] = vec[k-1];
+                }
+                vec[j] = kmh;
+                break;
+            }
+        }
+        // marca os reves somente para exibicao
+        if (!S.reves && dt<0) {
+            s8* vec = bests[player][0];
             for (int j=0; j<HITS_NRM; j++) {
-                if (kmh > vec[j]) {
-                    for (int k=HITS_NRM-1; k>j; k--) {
-                        vec[k] = vec[k-1];
-                    }
+                if (vec[j] == 0) {
                     vec[j] = kmh;
                     break;
                 }
             }
-            // marca os reves somente para exibicao
-            if (!S.reves && dt<0) {
-                s8* vec = bests[player][0];
-                for (int j=0; j<HITS_NRM; j++) {
-                    if (vec[j] == 0) {
-                        vec[j] = kmh;
-                        break;
-                    }
-                }
-            }
         }
-
-        G.time += (dt>0 ? dt : -dt);
     }
     G.time *= 10;
     G.time = min(G.time, S.timeout);

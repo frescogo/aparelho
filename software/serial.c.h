@@ -26,7 +26,7 @@ void Serial_Score (void) {
     Serial.println();
 
     Serial.print(F("PONTOS ............. "));
-    sprintf_P(STR, PSTR("%4d"), G.pontos);
+    sprintf_P(STR, PSTR("%d"), G.pontos);
     Serial.print(STR);
     Serial.println(F(" pontos"));
 
