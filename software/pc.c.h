@@ -67,7 +67,6 @@ void PC_Hit (int player, bool is_back, int kmh) {
     Serial.print(F(";"));
     Serial.print(kmh);                  // velocidade
     Serial.print(F(";"));
-    PC_Player(player);
     Serial.println();
 }
 
@@ -82,6 +81,8 @@ void PC_Tick (void) {
     Serial.print(F(";"));
     Serial.print((int)G.ritmo);       // media simples
     Serial.print(F(";"));
+    PC_Player(0);
+    PC_Player(1);
     Serial.println();
 }
 
