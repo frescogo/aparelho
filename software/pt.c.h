@@ -41,16 +41,18 @@ void PT_All (void) {
     G.hits  = 0;
     G.servs = 0;
 
-    s8 bests[2][2][REF_BESTS]; // kmh (max 125kmh/h)
-    memset(bests, 0, 2*2*REF_BESTS*sizeof(s8));
+    static s8 bests[2][2][REF_HITS]; // kmh (max 125kmh/h)
+    memset(bests, 0, 2*2*REF_HITS*sizeof(s8));
 
     u32 pace[2] = {0,0};        // overall   avg, avg2
 
     u32 volume[2] = {0,0};      // per-player avg2, avg2
     u16 hits_one[2] = {0,0};    // per-player hits
 
+//Serial.println("---");
     for (int i=0 ; i<S.hit ; i++) {
         s8 dt  = S.dts[i];
+//Serial.println((int)dt);
         s8 kmh = KMH(i);
 
         if (dt == HIT_SERV) {
@@ -108,6 +110,7 @@ void PT_All (void) {
         PT_Bests_Lado(HITS_REV, bests[i][LADO_REV], &jog->lados[LADO_REV]);
         G.jogs[i].pontos = (u32)jog->lados[LADO_NRM].pontos +
                            (u32)jog->lados[LADO_REV].pontos * (S.reves ? 1 : 0);
+//Serial.println((int)jog->lados[LADO_NRM].golpes);
     }
 
     u16 avg, min_;

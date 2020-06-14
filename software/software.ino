@@ -42,16 +42,18 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 
 #define DEF_TIMEOUT     240         // 4 mins
 #define REF_TIMEOUT     300         // 5 mins
-#define REF_BESTS       100
-#define REF_REV         20          // 20%
-#define REF_NRM         (100-REF_REV)
-#define REF_CONT        120         // 1.2%
+
+#define REF_HITS        170
+#define REF_REV         (S.reves ?  20 :   0)
+#define REF_NRM         (S.reves ? 150 : 170)
+
+#define REF_CONT        0 //120         // 1.2%
 #define REF_ABORT       15          // 15s per fall
 
-#define HITS_MAX        700
-#define HITS_REF        min(REF_BESTS, (S.timeout*REF_BESTS/REF_TIMEOUT/1000))
-#define HITS_NRM        max(1, HITS_REF*REF_NRM/100)
-#define HITS_REV        max(1, HITS_REF*REF_REV/100)
+#define HITS_MAX        650
+#define HITS_REF        (HITS_NRM + HITS_REV)
+#define HITS_NRM        min(REF_NRM,  max(1, REF_NRM * S.timeout / REF_TIMEOUT / 1000))
+#define HITS_REV        min(REF_REV,  max(1, REF_REV * S.timeout / REF_TIMEOUT / 1000))
 
 #define HIT_MIN_DT      235         // minimum time between two hits (125kmh)
 //#define HIT_KMH_MAX   125         // to fit in s8 (changed to u8, but lets keep 125)
