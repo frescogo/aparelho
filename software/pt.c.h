@@ -104,8 +104,8 @@ void PT_All (void) {
         Jog* jog = &G.jogs[i];
         PT_Bests_Lado(HITS_NRM, bests[i][LADO_NRM], &jog->lados[LADO_NRM]);
         PT_Bests_Lado(HITS_REV, bests[i][LADO_REV], &jog->lados[LADO_REV]);
-        G.jogs[i].pontos = ((u32)jog->lados[LADO_NRM].pontos*MULT_NRM +
-                            (u32)jog->lados[LADO_REV].pontos*MULT_REV) / 100;
+        G.jogs[i].pontos = (u32)jog->lados[LADO_NRM].pontos +
+                           (u32)jog->lados[LADO_REV].pontos * (S.reves ? 1 : 0);
     }
 
     u16 avg, min_;

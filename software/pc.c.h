@@ -43,17 +43,17 @@ void PC_Player (int I) {
     //Serial.print(F(";"));
 
     for (int i=0; i<LADO_NRM_REV; i++) {
-        Serial.print(G.jogs[I].lados[LADO_NRM].pontos);
+        Serial.print(G.jogs[I].lados[i].pontos);
         Serial.print(F(";"));
-        Serial.print(G.jogs[I].lados[LADO_NRM].golpes);
+        Serial.print(G.jogs[I].lados[i].golpes);
         Serial.print(F(";"));
         Serial.print((i==LADO_NRM) ? HITS_NRM : HITS_REV);
         Serial.print(F(";"));
-        Serial.print(G.jogs[I].lados[LADO_NRM].media2);
+        Serial.print(G.jogs[I].lados[i].media2);
         Serial.print(F(";"));
-        Serial.print(G.jogs[I].lados[LADO_NRM].minima);
+        Serial.print(G.jogs[I].lados[i].minima);
         Serial.print(F(";"));
-        Serial.print(G.jogs[I].lados[LADO_NRM].maxima);
+        Serial.print(G.jogs[I].lados[i].maxima);
         Serial.print(F(";"));
     }
 }
@@ -77,8 +77,6 @@ void PC_Tick (void) {
     Serial.print(G.time/1000);          // tempo jogado em ms
     Serial.print(F(";"));
     Serial.print(G.pontos);             // total da dupla
-    Serial.print(F(";"));
-    Serial.print(9999);                 // total da dupla // TODO-remove
     Serial.print(F(";"));
     Serial.print(G.hits);               // total de golpes
     Serial.print(F(";"));

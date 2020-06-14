@@ -72,17 +72,15 @@ void Serial_Score (void) {
             int pct, tot;
             Serial.print(F("   --> "));
             if (j == LADO_NRM) {
-                pct = MULT_NRM;
                 tot = HITS_NRM;
                 Serial.print(F("nrm"));
             } else {
-                pct = MULT_REV;
                 tot = HITS_REV;
                 Serial.print(F("rev"));
             }
             Lado* lado = &G.jogs[i].lados[j];
-            sprintf_P(STR, PSTR(": %4d pontos  (%3d%%)  (golpes: %3d/%3d, media: %2d, min: %2d, max: %2d)"),
-                lado->pontos, pct, lado->golpes, tot, lado->media2, lado->minima, lado->maxima);
+            sprintf_P(STR, PSTR(": %4d pontos  (golpes: %3d/%3d, media: %2d, min: %2d, max: %2d)"),
+                lado->pontos, lado->golpes, tot, lado->media2, lado->minima, lado->maxima);
             Serial.println(STR);
         }
     }

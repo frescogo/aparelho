@@ -43,13 +43,15 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 #define DEF_TIMEOUT     240         // 4 mins
 #define REF_TIMEOUT     300         // 5 mins
 #define REF_BESTS       100
-#define REF_REVES       20          // 20%
+#define REF_REV         20          // 20%
+#define REF_NRM         (100-REF_REV)
 #define REF_CONT        120         // 1.2%
 #define REF_ABORT       15          // 15s per fall
 
 #define HITS_MAX        700
-#define HITS_NRM        (max(1, min(REF_BESTS, (S.timeout*REF_BESTS/REF_TIMEOUT/1000))))
-#define HITS_REV        (max(1, HITS_NRM*REF_REVES/100))
+#define HITS_REF        min(REF_BESTS, (S.timeout*REF_BESTS/REF_TIMEOUT/1000))
+#define HITS_NRM        max(1, HITS_REF*REF_NRM/100)
+#define HITS_REV        max(1, HITS_REF*REF_REV/100)
 
 #define HIT_MIN_DT      235         // minimum time between two hits (125kmh)
 //#define HIT_KMH_MAX   125         // to fit in s8 (changed to u8, but lets keep 125)
@@ -81,9 +83,6 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 //#define CONT_PCT(f,t)   min(CONT_MAX, f * (((u32)REF_TIMEOUT)*REF_CONT*1000/max(1,t)))
 #define CONT_PCT(f,t)   min(9999, f * (((u32)REF_TIMEOUT)*REF_CONT*1000/max(1,t)))
 #define ABORT_FALLS     (S.timeout / REF_ABORT / 1000)
-
-#define MULT_NRM        (S.reves ? (100-REF_REVES) : 100)
-#define MULT_REV        (S.reves ? (    REF_REVES) :   0)
 
 static int  STATE;
 static bool IS_BACK;
