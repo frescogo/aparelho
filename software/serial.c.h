@@ -7,7 +7,7 @@ void Serial_Pars (void) {
                 (int)S.maxima,
                 (int)S.reves,
                 (int)S.equilibrio,
-                (int)CONT_PCT(1,S.timeout),
+                (int)CONT_PCT,
                 (int)ABORT_FALLS);
     Serial.println(STR);
 }
@@ -183,7 +183,7 @@ void Serial_Log (void) {
     PT_Equ(&avg,&min_);
 
     u16 equ = (!S.equilibrio ? 0 : avg - min_);
-    u16 pct = CONT_PCT(Falls(),G.time);
+    u16 pct = Falls() * CONT_PCT;
 
     sprintf_P(STR, PSTR("Media ........... %02d.%02d"), avg/100, avg%100);
     Serial.print(STR);
