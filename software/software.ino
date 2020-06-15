@@ -47,7 +47,7 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 #define REF_REV         (S.reves ?  20 :   0)
 #define REF_NRM         (S.reves ? 150 : 170)
 
-#define REF_CONT        0 //120         // 1.2%
+#define REF_CONT        200         // 2.0%
 #define REF_ABORT       15          // 15s per fall
 
 #define HITS_MAX        650
