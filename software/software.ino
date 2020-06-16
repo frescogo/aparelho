@@ -43,9 +43,9 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 #define DEF_TIMEOUT     240         // 4 mins
 #define REF_TIMEOUT     300         // 5 mins
 
-#define REF_HITS        250
-#define REF_REV         0
-#define REF_NRM         250
+#define REF_HITS        170
+#define REF_REV         (S.reves ?  20 :   0)
+#define REF_NRM         (S.reves ? 150 : 170)
 
 #define REF_CONT        160         // 1.6%
 #define REF_ABORT       15          // 15s per fall
