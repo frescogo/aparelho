@@ -11,7 +11,7 @@ void PT_Bests_Lado (int n, s8* bests, Lado* lado) {
     }
     lado->minima = bests[n-1];
     lado->maxima = bests[0];
-    lado->media1 = sum/lado->golpes;
+    lado->media1 = (lado->golpes == 0) ? 0 : sum/lado->golpes;
     lado->pontos = lado->media1 * lado->golpes;
 }
 
@@ -39,6 +39,7 @@ int PT_Behind (void) {
 void PT_All (void) {
     G.time  = 0;
     G.hits  = 0;
+    G.atas  = 0;
     G.servs = 0;
 
     static s8 bests[2][2][REF_HITS]; // kmh (max 125kmh/h)
@@ -60,15 +61,17 @@ void PT_All (void) {
 
         G.time += (dt>0 ? dt : -dt);
 
-        if (kmh < HIT_KMH_50) {
-            continue;
-        }
-
         if (i==S.hit-1 || S.dts[i+1]==HIT_NONE || S.dts[i+1]==HIT_SERV) {
             continue; // ignore last hit
         }
 
         G.hits++;
+
+        if (kmh < HIT_KMH_50) {
+            continue;
+        }
+
+        G.atas++;
 
         int player = 1 - (i%2);
 

@@ -42,8 +42,8 @@ void Serial_Score (void) {
     Serial.print(F("Quedas ............. "));
     Serial.println(Falls());
 
-    Serial.print(F("Golpes ............. "));
-    Serial.println(G.hits);
+    Serial.print(F("Ataques ............ "));
+    Serial.println(G.atas);
 
     Serial.print(F("Ritmo .............. "));
     if (G.time > 5000) {
@@ -166,7 +166,7 @@ void Serial_Log (void) {
     Serial.println(F("-----------------------------------------------"));
     Serial.println();
 
-    Serial.println(F("    Atleta   |    Nrm    Rev    |     Total"));
+    Serial.println(F("    Atleta   |    Nrm    Rev   |     Total"));
     for (int i=0; i<2; i++) {
         sprintf_P(STR, PSTR("%10s   |   %4d   %4d   |   %04d pontos"),
             S.names[i],

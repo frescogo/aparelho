@@ -43,9 +43,9 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 #define DEF_TIMEOUT     240         // 4 mins
 #define REF_TIMEOUT     300         // 5 mins
 
-#define REF_HITS        170
-#define REF_REV         (S.reves ?  20 :   0)
-#define REF_NRM         (S.reves ? 150 : 170)
+#define REF_HITS        150
+#define REF_REV         (S.reves ?  15 :   0)
+#define REF_NRM         (S.reves ? 135 : 150)
 
 #define REF_CONT        160         // 1.6%
 #define REF_ABORT       15          // 15s per fall
@@ -137,6 +137,7 @@ typedef struct {
     // calculated when required
     u32  time;                        // ms (total time)
     u16  hits;
+    u16  atas;
     u8   servs;
     s8   ritmo;                       // kmh
 
