@@ -80,7 +80,7 @@ void Serial_Score (void) {
             }
             Lado* lado = &G.jogs[i].lados[j];
             sprintf_P(STR, PSTR(": %4d pontos  (ata: %3d/%3d, med: %2d, min: %2d, max: %2d)"),
-                lado->pontos, lado->golpes, tot, lado->media2, lado->minima, lado->maxima);
+                lado->pontos, lado->golpes, tot, lado->media1, lado->minima, lado->maxima);
             Serial.println(STR);
         }
     }

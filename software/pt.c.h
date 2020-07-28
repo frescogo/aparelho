@@ -1,18 +1,18 @@
 void PT_Bests_Lado (int n, s8* bests, Lado* lado) {
     lado->golpes = 0;
-    u32 sum = 0;
+    u16 sum = 0;
     for (int i=0; i<n; i++) {
         s8 v = bests[i];
         if (v == 0) {
             break;
         }
         lado->golpes++;
-        sum += v*v;
+        sum += v;
     }
     lado->minima = bests[n-1];
     lado->maxima = bests[0];
-    lado->media2 = sqrt(sum/lado->golpes);
-    lado->pontos = lado->media2 * lado->golpes;
+    lado->media1 = sum/lado->golpes;
+    lado->pontos = lado->media1 * lado->golpes;
 }
 
 int PT_Equ (u16* avg, u16* min_) {
@@ -43,11 +43,6 @@ void PT_All (void) {
 
     static s8 bests[2][2][REF_HITS]; // kmh (max 125kmh/h)
     memset(bests, 0, 2*2*REF_HITS*sizeof(s8));
-
-    u32 pace[2] = {0,0};        // overall   avg, avg2
-
-    u32 volume[2] = {0,0};      // per-player avg2, avg2
-    u16 hits_one[2] = {0,0};    // per-player hits
 
 //Serial.println("---");
     for (int i=0 ; i<S.hit ; i++) {

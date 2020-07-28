@@ -1,6 +1,6 @@
 #define MAJOR    3
 #define MINOR    0
-#define REVISION 0
+#define REVISION 1
 
 //#define DEBUG
 
@@ -123,7 +123,7 @@ typedef struct {
     u8  golpes;
     u8  minima;
     u8  maxima;
-    u8  media2;
+    u8  media1;
     u16 pontos;
 } Lado;
 

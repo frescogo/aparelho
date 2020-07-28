@@ -49,7 +49,7 @@ void PC_Player (int I) {
         Serial.print(F(";"));
         Serial.print((i==LADO_NRM) ? HITS_NRM : HITS_REV);
         Serial.print(F(";"));
-        Serial.print(G.jogs[I].lados[i].media2);
+        Serial.print(G.jogs[I].lados[i].media1);
         Serial.print(F(";"));
         Serial.print(G.jogs[I].lados[i].minima);
         Serial.print(F(";"));
