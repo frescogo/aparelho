@@ -1,18 +1,17 @@
 void PT_Bests_Lado (int n, s8* bests, Lado* lado) {
-    lado->golpes = 0;
-    u16 sum = 0;
+    u32 sum = 0;
     for (int i=0; i<n; i++) {
         s8 v = bests[i];
         if (v == 0) {
             break;
         }
-        lado->golpes++;
         sum += v;
     }
+    int golpes = min(n, lado->golpes);
     lado->minima = bests[n-1];
     lado->maxima = bests[0];
-    lado->media1 = (lado->golpes == 0) ? 0 : sum/lado->golpes;
-    lado->pontos = lado->media1 * lado->golpes;
+    lado->media1 = (golpes == 0) ? 0 : sum*100/golpes;
+    lado->pontos = sum;
 }
 
 int PT_Equ (u16* avg, u16* min_) {
@@ -45,6 +44,12 @@ void PT_All (void) {
     static s8 bests[2][2][REF_HITS]; // kmh (max 125kmh/h)
     memset(bests, 0, 2*2*REF_HITS*sizeof(s8));
 
+    for (int i=0; i<2; i++) {
+        for (int j=0; j<2; j++) {
+            G.jogs[i].lados[j].golpes = 0;
+        }
+    }
+
 //Serial.println("---");
     for (int i=0 ; i<S.hit ; i++) {
         s8 dt  = S.dts[i];
@@ -73,10 +78,13 @@ void PT_All (void) {
 
         G.atas++;
 
+        int is_rev = (dt<0 && S.reves);
         int player = 1 - (i%2);
 
+        G.jogs[player].lados[is_rev].golpes++;
+
         // bests
-        s8* vec = bests[player][ dt<0 && S.reves ];
+        s8* vec = bests[player][is_rev];
         for (int j=0; j<HITS_NRM; j++) {
             if (kmh > vec[j]) {
                 for (int k=HITS_NRM-1; k>j; k--) {

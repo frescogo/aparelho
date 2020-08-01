@@ -1,6 +1,6 @@
 #define MAJOR    3
 #define MINOR    0
-#define REVISION 1
+#define REVISION 2
 
 //#define DEBUG
 
@@ -120,10 +120,10 @@ enum {
 };
 
 typedef struct {
-    u8  golpes;
+    u16 golpes;
     u8  minima;
     u8  maxima;
-    u8  media1;
+    u16 media1;     // 6156 = 61.56 km/h
     u16 pontos;
 } Lado;
 
