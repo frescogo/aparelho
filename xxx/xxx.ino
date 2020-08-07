@@ -247,11 +247,11 @@ void EEPROM_Default (void) {
     strcpy(S.juiz,     "?");
     strcpy(S.names[0], "Atleta ESQ");
     strcpy(S.names[1], "Atleta DIR");
-    S.distancia     = 750;
-    S.timeout       = DEF_TIMEOUT * ((u32)1000);
-    S.equilibrio    = 1;
-    S.maxima        = 85;
-    S.reves         = 0;
+    S.distancia  = 750;
+    S.timeout    = DEF_TIMEOUT * ((u32)1000);
+    S.equilibrio = 1;
+    S.maxima     = 85;
+    S.reves      = 0;
 }
 
 void setup (void) {
@@ -372,6 +372,7 @@ _SERVICE:
 
 // SERVICE
 
+        Radar_Flush();
         s8 kmh_ = 0;
         u8 kmh  = 0;
         int is_out;

@@ -18,20 +18,25 @@ typedef struct {
     char none[13]; 
 } Radar_S;
 
-s8 tovel (Radar_S* s) {
+int tovel (Radar_S* s) {
     int ret = (s->peak[0] - '0') * 1000 +
               (s->peak[1] - '0') *  100 +
               (s->peak[2] - '0') *   10 +
               (s->peak[3] - '0');
-    assert(abs(ret) < 128);
-    return (s8) ret;
+    return ret;
 }
 
 void Radar_Setup () {
     Serial1.begin(9600);
 }
 
-s8 Radar () {
+void Radar_Flush () {
+    while (Serial1.available()) {
+        Serial1.read();
+    }
+}
+
+int Radar () {
 #if 1
     static u32 old = millis();
     u32 now = millis();
@@ -55,9 +60,7 @@ s8 Radar () {
     Radar_S s;
     Serial1.readBytes((char*)&s, sizeof(Radar_S));
 
-    s8 vel = tovel(&s);
-    //Serial.println(vel);
-    //Serial.println(dir);
+    int vel = tovel(&s);
     if (vel < MIN_VEL) {
         return 0;
     }
@@ -70,6 +73,7 @@ s8 Radar () {
 
     old = now;
     dir = s.dir;
+    vel /= 10;
     return (dir == 'A') ? vel : -vel;
 #endif
 }
