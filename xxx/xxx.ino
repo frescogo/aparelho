@@ -38,8 +38,6 @@ typedef unsigned long u32;
 
 #define PIN_TONE 11
 
-static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
-
 #define DEF_TIMEOUT     240         // 4 mins
 #define REF_TIMEOUT     300         // 5 mins
 
@@ -55,14 +53,8 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 #define HITS_NRM        min(REF_NRM,  max(1, REF_NRM * S.timeout / REF_TIMEOUT / 1000))
 #define HITS_REV        min(REF_REV,  max(1, REF_REV * S.timeout / REF_TIMEOUT / 1000))
 
-#define HIT_MIN_DT      235         // minimum time between two hits (125kmh)
-//#define HIT_KMH_MAX   125         // to fit in s8 (changed to u8, but lets keep 125)
 #define HIT_KMH_MAX     99          // safe value to avoid errors
 #define HIT_KMH_50      50
-
-#define HIT_MARK        0
-#define HIT_NONE        1
-#define HIT_SERV        2
 
 #define STATE_IDLE      0
 #define STATE_PLAYING   1
@@ -88,7 +80,6 @@ static const int MAP[2] = { PIN_LEFT, PIN_RIGHT };
 #define ABORT_FALLS     (S.timeout / REF_ABORT / 1000)
 
 static int  STATE;
-static bool IS_BACK;
 static char STR[64];
 
 typedef enum {
@@ -97,6 +88,11 @@ typedef enum {
 } TMOD;
 
 TMOD MOD;
+
+typedef struct {    // { 0,kmh } --> saque
+    u8 dt;          // 10        --> 10*100ms --> 1s
+    s8 kmh;
+} Hit;
 
 typedef struct {
     char juiz[NAME_MAX+1];      // = "Juiz"
@@ -109,7 +105,7 @@ typedef struct {
 
     u16  descanso;              // cs (ms*10) (até 650s de descanso)
     u16  hit;
-    s8   dts[HITS_MAX];         // cs (ms*10)
+    Hit  hits[HITS_MAX];
 } Save;
 static Save S;
 
@@ -136,8 +132,6 @@ typedef struct {
 typedef struct {
     // calculated when required
     u32  time;                        // ms (total time)
-    u16  hits;
-    u16  atas;
     u8   servs;
     s8   ritmo;                       // kmh
 
@@ -147,14 +141,13 @@ typedef struct {
 static Game G;
 
 enum {
-    IN_LEFT  = 0,   // must be 0 (bc of MAP and 1-X)
-    IN_RIGHT = 1,   // must be 1 (bc of MAP and 1-X)
     IN_NONE,
     IN_GO_FALL,
     IN_TIMEOUT,
     IN_RESTART,
     IN_UNDO,
-    IN_RESET
+    IN_RESET,
+    IN_RADAR
 };
 
 int Falls (void) {
@@ -169,19 +162,14 @@ static const int NOTES[] = { NOTE_E3, NOTE_E5, NOTE_G5, NOTE_B5, NOTE_D6 };
 #include "serial.c.h"
 #include "xcel.c.h"
 #include "pc.c.h"
+#include "radar.c.h"
 
-void Sound (s8 kmh, bool is_back) {
+void Sound (s8 kmh) {
     int ton = NOTES[min(max(0,kmh/10-4), 4)];
-    if (is_back && kmh>=HIT_KMH_50) {
-        tone(PIN_TONE, ton, 20);
-        delay(35);
-        tone(PIN_TONE, ton, 20);
-    } else {
-        tone(PIN_TONE, ton, 50);
-    }
+    tone(PIN_TONE, ton, 50);
 }
 
-int Await_Input (bool serial, bool hold) {
+int Await_Input (bool serial, bool hold, s8* kmh) {
     static u32 old;
     static int pressed = 0;
     while (1) {
@@ -192,22 +180,22 @@ int Await_Input (bool serial, bool hold) {
             }
         }
 
+        if (kmh != NULL) {
+            *kmh = Radar();
+            if (*kmh != 0) {
+                return IN_RADAR;
+            }
+        }
+
         u32 now = millis();
 
         int pin_left  = digitalRead(PIN_LEFT);
         int pin_right = digitalRead(PIN_RIGHT);
 
         // CFG UNPRESSED
-        if (digitalRead(PIN_CFG) == HIGH)
-        {
+        if (digitalRead(PIN_CFG) == HIGH) {
             pressed = 0;
             old = now;
-            if (pin_left == LOW) {
-                return IN_LEFT;
-            }
-            if (pin_right == LOW) {
-                return IN_RIGHT;
-            }
         }
 
         // CFG PRESSED
@@ -240,16 +228,6 @@ int Await_Input (bool serial, bool hold) {
     }
 }
 
-u8 KMH (int i) {
-    s8 dt = S.dts[i];
-    dt = (dt > 0) ? dt : -dt;
-    u32 kmh_ = ((u32)36) * S.distancia / (dt*10);
-               // prevents overflow
-    u8 kmh = min(kmh_, HIT_KMH_MAX);
-       kmh = min(kmh, S.maxima);
-    return kmh;
-}
-
 void EEPROM_Load (void) {
     for (int i=0; i<sizeof(Save); i++) {
         ((byte*)&S)[i] = EEPROM[i];
@@ -278,6 +256,7 @@ void EEPROM_Default (void) {
 
 void setup (void) {
     Serial.begin(9600);
+    Radar_Setup();
 
     pinMode(PIN_CFG,   INPUT_PULLUP);
     pinMode(PIN_LEFT,  INPUT_PULLUP);
@@ -285,7 +264,7 @@ void setup (void) {
 
     delay(2000);
     if (Serial.available()) {
-        MOD = Serial.read();
+        MOD = (TMOD) Serial.read();
     } else {
         MOD = MOD_CEL;
     }
@@ -349,9 +328,8 @@ void loop (void)
             goto _TIMEOUT;
         }
 
-        int got;
         while (1) {
-            got = Await_Input(true,true);
+            int got = Await_Input(true,true,NULL);
             switch (got) {
                 case IN_RESET:
                     EEPROM_Default();
@@ -365,10 +343,8 @@ _UNDO:
                             S.hit -= 1;
                             if (S.hit == 0) {
                                 break;
-                            } else if (S.dts[S.hit] == HIT_SERV) {
-                                if (S.dts[S.hit-1] == HIT_NONE) {
-                                    S.hit -= 1;
-                                }
+                            } else if (S.hits[S.hit].dt == 0) {
+                                S.hit -= 1;
                                 break;
                             }
                         }
@@ -395,21 +371,26 @@ _SERVICE:
         tone(PIN_TONE, NOTE_C7, 500);
 
 // SERVICE
+
+        s8 kmh_ = 0;
+        u8 kmh  = 0;
+        int is_out;
+
         while (1) {
-            got = Await_Input(true,false);
+            int got = Await_Input(true,false,&kmh_);
             switch (got) {
                 case IN_RESET:
                     EEPROM_Default();
                     goto _RESTART;
                 case IN_RESTART:
                     goto _RESTART;
-                case IN_LEFT:
-                case IN_RIGHT:
-                    goto _BREAK2;
-
                 case IN_GO_FALL:
                     Desc(millis(), &desc0, false);
                     goto _SERVICE;
+                case IN_RADAR:
+                    kmh = abs(kmh_);
+                    is_out = (kmh_ > 0);
+                    goto _BREAK2;
 
                 case IN_NONE:
                     u32 now = millis();
@@ -423,36 +404,17 @@ _SERVICE:
 _BREAK2:
 
         u32 t0 = millis();
-
         Desc(t0, &desc0, true);
-
-        if (got != S.hit%2) {
-            S.dts[S.hit++] = HIT_NONE;
-        }
-        S.dts[S.hit++] = HIT_SERV;
+        S.hits[S.hit++] = { 0, (s8)kmh_ };
+        Sound(kmh);
+        XMOD(CEL_Service(is_out), PC_Hit(is_out,false,kmh));
         STATE = STATE_PLAYING;
-
-        tone(PIN_TONE, NOTES[0], 50);
-
-        IS_BACK = false;
-
-        XMOD(CEL_Service(got), PC_Hit(1-got,false,0));
-
         PT_All();
-        delay(HIT_MIN_DT);
 
-        int nxt = 1 - got;
         while (1)
         {
-            // wait "got" pin to unpress
-            while (digitalRead(MAP[got]) == LOW)
-                ;
-
-// HIT
-            u32 t1;
-            int dt;
             while (1) {
-                got = Await_Input(true,true);
+                int got = Await_Input(true,true,&kmh_);
                 if (got == IN_RESET) {
                     EEPROM_Default();
                     goto _RESTART;
@@ -462,60 +424,31 @@ _BREAK2:
                     goto _TIMEOUT;
                 } else if (got == IN_GO_FALL) {
                     goto _FALL;
-                } else if (got==IN_LEFT || got==IN_RIGHT) {
-                    t1 = millis();
-                    dt = (t1 - t0);
-                    if (got==nxt || dt>=3*HIT_MIN_DT) {
-                        break;
-                    } else {
-                        // ball cannot go back and forth so fast
-                    }
+                } else if (got == IN_RADAR) {
+                    kmh = abs(kmh_);
+                    is_out = (kmh_ > 0);
+                    break;
                 }
             }
-            //ceu_arduino_assert(dt>50, 2);
 
+            u32 t1 = millis();
+            int dt = (t1 - t0);
             t0 = t1;
 
-            bool skipped = (nxt != got);
-            if (skipped) {
-                dt = dt / 2;
-            }
-            dt = min(dt/10, 127); // we don't have space for dt>1270ms,so we'll
-                                  // just assume it since its already slow
-
-            u32 kmh_ = ((u32)36) * S.distancia / (dt*10);
-                       // prevents overflow
-            s8 kmh = min(kmh_, HIT_KMH_MAX);
-            kmh = min(kmh_, S.maxima);
-
-            // nao pode ser "skipped" (eh uma maneira de corrigir um erro de marcacao)
-            // 10% mais forte que golpe anterior
-            bool is_back = IS_BACK && !skipped && (kmh >= KMH(S.hit-1)*REV_PCT);
+            dt = min(dt/100, 255);              // maximo DT=25500ms
+            S.hits[S.hit++] = { (u8)dt, (s8)kmh_ };
 
             u8 al_now = 0;
-            if (G.time+dt*10 > alarm()) {
+            if (G.time+dt*100 > alarm()) {
                 tone(PIN_TONE, NOTE_C7, 250);
                 al_now = 1;
             } else {
-                Sound(kmh, is_back);
+                Sound(kmh);
             }
-
-            if (is_back) {
-                S.dts[S.hit] = -dt;
-            } else {
-                S.dts[S.hit] = dt;
-            }
-            S.hit++;
-            if (skipped) {
-                S.dts[S.hit]  = dt;
-                S.hit++;
-            }
-            nxt = 1 - got;
 
             PT_All();
             XMOD(CEL_Nop(), PC_Tick());
 
-// TIMEOUT
             if (G.time >= S.timeout) {
                 goto _TIMEOUT;
             }
@@ -523,49 +456,17 @@ _BREAK2:
                 goto _TIMEOUT;
             }
 
-            // sleep inside hit to reach S.reves
-            {
-                int sensibilidade = (!S.reves) ? REVES_MIN : S.reves;
-                u32 dt_ = millis() - t1;
-                if (sensibilidade > dt_) {
-                    delay(sensibilidade-dt_);
-                }
-                if (got == 0) {
-                    IS_BACK = (digitalRead(PIN_LEFT)  == LOW);
-                } else {
-                    IS_BACK = (digitalRead(PIN_RIGHT) == LOW);
-                }
-                if (!al_now)
-                {
-                    if (IS_BACK) {
-                        tone(PIN_TONE, NOTE_C4, 30);
-                    } else if (S.equilibrio) {
-                        // desequilibrio
-                        if (G.time >= 30000) {
-                            if (PT_Behind() == nxt) {
-                                tone(PIN_TONE, NOTE_C2, 30);
-                            }
-                        }
-                    }
-                }
+            if (!al_now && S.equilibrio && G.time>=30000 && PT_Behind()==is_out) {
+                tone(PIN_TONE, NOTE_C2, 30);
             }
-
-            if (skipped) {
-                XMOD(CEL_Hit(  got,IS_BACK,kmh), PC_Hit(  got,IS_BACK,kmh));
-                XMOD(CEL_Hit(1-got,false,  kmh), PC_Hit(1-got,false,  kmh));
-            } else {
-                XMOD(CEL_Hit(1-got,IS_BACK,kmh), PC_Hit(1-got,IS_BACK,kmh));
-            }
-
-            // sleep inside hit to reach HIT_MIN_DT
-            {
-                u32 dt_ = millis() - t1;
-                if (HIT_MIN_DT > dt_) {
-                    delay(HIT_MIN_DT-dt_);
-                }
-            }
+            XMOD(CEL_Hit(is_out,false,kmh), PC_Hit(is_out,false,abs(kmh)));
         }
 _FALL:
+        S.hit--;    // desconta o ultimo ataque, nao sabemos se foi defendido
+        if (Falls() >= ABORT_FALLS) {
+            S.hits[S.hit++] = { 0, 0 }; // emula um saque nulo pra contar essa queda
+        }
+
         STATE = STATE_IDLE;
 
         tone(PIN_TONE, NOTE_C4, 100);
@@ -579,10 +480,6 @@ _FALL:
         XMOD(CEL_Fall(), PC_Fall());
         XMOD(CEL_Nop(),  PC_Tick());
         EEPROM_Save();
-
-        if (Falls() >= ABORT_FALLS) {
-            S.dts[S.hit++] = HIT_SERV;  // simulate timeout after service
-        }
     }
 
 _TIMEOUT:
@@ -594,7 +491,7 @@ _TIMEOUT:
     EEPROM_Save();
 
     while (1) {
-        int got = Await_Input(true,true);
+        int got = Await_Input(true,true,NULL);
         if (got == IN_RESET) {
             EEPROM_Default();
             goto _RESTART;
