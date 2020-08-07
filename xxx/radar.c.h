@@ -73,7 +73,7 @@ int Radar () {
 
     old = now;
     dir = s.dir;
-    vel /= 10;
+    vel = (vel + 5) / 10;   // round
     return (dir == 'A') ? vel : -vel;
 #endif
 }
