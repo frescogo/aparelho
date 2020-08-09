@@ -1,3 +1,8 @@
+// TODO:
+// - ritmo nao faz sentido sem distancia
+// - fazer tempo em tempo real?
+// - golpe 0 a cada 5s?
+
 #define MAJOR    3
 #define MINOR    0
 #define REVISION 2
@@ -132,8 +137,9 @@ typedef struct {
 typedef struct {
     // calculated when required
     u32  time;                        // ms (total time)
-    u8   servs;
+    u8   saques;
     s8   ritmo;                       // kmh
+    u16  ataques;
 
     u16  pontos;
     Jog  jogs[2];
@@ -151,7 +157,7 @@ enum {
 };
 
 int Falls (void) {
-    return G.servs - (STATE==STATE_IDLE ? 0 : 1);
+    return G.saques - (STATE==STATE_IDLE ? 0 : 1);
                         // after fall
 }
 
@@ -408,7 +414,8 @@ _BREAK2:
         Desc(t0, &desc0, true);
         S.hits[S.hit++] = { 0, (s8)kmh_ };
         Sound(kmh);
-        XMOD(CEL_Service(is_out), PC_Hit(is_out,false,kmh));
+        XMOD(CEL_Service(is_out), PC_Nop());
+        XMOD(CEL_Hit(is_out,false,kmh), PC_Hit(is_out,false,kmh));
         STATE = STATE_PLAYING;
         PT_All();
 
@@ -433,10 +440,10 @@ _BREAK2:
             }
 
             u32 t1 = millis();
-            int dt = (t1 - t0);
+            u32 dt = (t1 - t0);
             t0 = t1;
 
-            dt = min(dt/100, 255);              // maximo DT=25500ms
+            dt = min(dt/100, 255);              // maximo DT=25.500ms
             S.hits[S.hit++] = { (u8)dt, (s8)kmh_ };
 
             u8 al_now = 0;
@@ -450,6 +457,9 @@ _BREAK2:
             PT_All();
             XMOD(CEL_Nop(), PC_Tick());
 
+//Serial.println(dt);
+//Serial.println(G.time);
+
             if (G.time >= S.timeout) {
                 goto _TIMEOUT;
             }
@@ -460,10 +470,9 @@ _BREAK2:
             if (!al_now && S.equilibrio && G.time>=30000 && PT_Behind()==is_out) {
                 tone(PIN_TONE, NOTE_C2, 30);
             }
-            XMOD(CEL_Hit(is_out,false,kmh), PC_Hit(is_out,false,abs(kmh)));
+            XMOD(CEL_Hit(is_out,false,kmh), PC_Hit(is_out,false,kmh));
         }
 _FALL:
-        S.hit--;    // desconta o ultimo ataque, nao sabemos se foi defendido
         if (Falls() >= ABORT_FALLS) {
             S.hits[S.hit++] = { 0, 0 }; // emula um saque nulo pra contar essa queda
         }

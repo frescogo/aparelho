@@ -6,8 +6,7 @@
 // Global variables use 1731 bytes (21%) of dynamic memory, leaving 6461 bytes for local variables.
 // Maximum is 8192 bytes.
 
-#define MIN_VEL 500
-#define MIN_DT  500
+#define MIN_DT 500  // DT minimo para aceitar velocidades consecutivas na mesma direcao
 
 typedef unsigned long u32;
 
@@ -37,7 +36,7 @@ void Radar_Flush () {
 }
 
 int Radar () {
-#if 1
+#if 0
     static u32 old = millis();
     u32 now = millis();
     u32 dt = now - old;
@@ -61,10 +60,6 @@ int Radar () {
     Serial1.readBytes((char*)&s, sizeof(Radar_S));
 
     int vel = tovel(&s);
-    if (vel < MIN_VEL) {
-        return 0;
-    }
-
     u32 now = millis();
     u32 dt = now - old;
     if (s.dir==dir && dt<MIN_DT) {

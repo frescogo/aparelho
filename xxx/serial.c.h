@@ -43,7 +43,7 @@ void Serial_Score (void) {
     Serial.println(Falls());
 
     Serial.print(F("Ataques ............ "));
-    Serial.println(S.hit);
+    Serial.println(G.ataques);
 
     Serial.print(F("Ritmo .............. "));
     if (G.time > 5000) {
@@ -118,20 +118,14 @@ void Serial_Log (void) {
             Serial.print(F("          "));
         }
 
-        if (dt == 0) {
-            Serial.print(F("****"));
-        } else {
-            sprintf_P(STR, PSTR("%4d"), dt*100);
-            Serial.print(STR);
-        }
+        sprintf_P(STR, PSTR("%4d"), dt*100);
+        Serial.print(STR);
 
         if (i==S.hit-1 || S.hits[i+1].dt==0) {
             Serial.println();
             //Serial.println(F("   -----   -----"));
             //sprintf_P(STR, PSTR("   %5ld   %5ld"), ps[0]/100, ps[1]/100);
             //Serial.println(STR);
-        } else if (dt == 0) {
-            // ignore
         } else {
             //u16 pt = ((u16)kmh)*((u16)kmh);
             //ps[1 - i%2] += pt;

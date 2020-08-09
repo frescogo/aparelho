@@ -36,8 +36,9 @@ int PT_Behind (void) {
 }
 
 void PT_All (void) {
-    G.time  = 0;
-    G.servs = 0;
+    G.time    = 0;
+    G.saques  = 0;
+    G.ataques = 0;
 
     static s8 bests[2][2][REF_HITS]; // kmh (max 125kmh/h)
     memset(bests, 0, 2*2*REF_HITS*sizeof(s8));
@@ -50,16 +51,26 @@ void PT_All (void) {
 
 //Serial.println("---");
     for (int i=0 ; i<S.hit ; i++) {
-        s8 dt  = S.hits[i].dt;
+        u8 dt  = S.hits[i].dt;
         s8 kmh = S.hits[i].kmh;
         int is_out = (kmh > 0);
 
         if (dt == 0) {
-            G.servs++;
+            G.saques++;
         }
 
+//Serial.println((int)dt);
         G.time += dt;
 
+        if (i==S.hit-1 || S.hits[i+1].dt==0) {
+            continue; // conta dt, mas nao golpes/kmh do ultimo (nao sabemos se foi defendido)
+        }
+
+        if (kmh < HIT_KMH_50) {
+            continue;
+        }
+
+        G.ataques++;
         G.jogs[is_out].lados[0].golpes++;
 
         // bests
