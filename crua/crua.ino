@@ -2,14 +2,14 @@
 
 void setup (void) {
     Serial.begin(9600);
-    Serial1.begin(9600);
+    radar_setup();
     Serial.println("=== RADAR ===");
 }
 
 void loop (void) {
     static int zero = false;
     Radar_S s;
-    int vel = radar(&s);
+    int vel = radar_read(&s);
     if (vel == 0) {
         if (!zero) {
             Serial.println("========");

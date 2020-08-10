@@ -187,8 +187,10 @@ int Await_Input (bool serial, bool hold, s8* kmh) {
         }
 
         if (kmh != NULL) {
-            *kmh = Radar();
-            if (*kmh != 0) {
+            Radar_S s;
+            int val = radar_read(&s);
+            if (val != 0) {
+                *kmh = val/10;
                 return IN_RADAR;
             }
         }
@@ -262,7 +264,7 @@ void EEPROM_Default (void) {
 
 void setup (void) {
     Serial.begin(9600);
-    Radar_Setup();
+    radar_setup();
 
     pinMode(PIN_CFG,   INPUT_PULLUP);
     pinMode(PIN_LEFT,  INPUT_PULLUP);
@@ -378,7 +380,6 @@ _SERVICE:
 
 // SERVICE
 
-        Radar_Flush();
         s8 kmh_ = 0;
         u8 kmh  = 0;
         int is_out;

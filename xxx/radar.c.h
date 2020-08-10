@@ -1,74 +1,130 @@
-// Sketch uses 18212 bytes (59%) of program storage space. Maximum is 30720 bytes.
-// Global variables use 1716 bytes (83%) of dynamic memory, leaving 332 bytes for local variables.
-// Maximum is 2048 bytes.
-
-// Sketch uses 18922 bytes (7%) of program storage space. Maximum is 253952 bytes.
-// Global variables use 1731 bytes (21%) of dynamic memory, leaving 6461 bytes for local variables.
-// Maximum is 8192 bytes.
-
-#define MIN_DT 500  // DT minimo para aceitar velocidades consecutivas na mesma direcao
-
-typedef unsigned long u32;
+#define DT_500 500
 
 typedef struct {
-    char type;
-    char dir;
-    char peak[4];
-    char none[13]; 
+    char peak_dir;
+    char peak_val[4];
+    char live_dir;
+    char live_val[4];
+    char size[3];
+    char ratio[3];
+    char status;
+    char cr;
 } Radar_S;
 
-int tovel (Radar_S* s) {
-    int ret = (s->peak[0] - '0') * 1000 +
-              (s->peak[1] - '0') *  100 +
-              (s->peak[2] - '0') *   10 +
-              (s->peak[3] - '0');
-    return ret;
+int four (char* num) {
+    return
+        (num[0] - '0') * 1000 +
+        (num[1] - '0') *  100 +
+        (num[2] - '0') *   10 +
+        (num[3] - '0') *    1;
 }
 
-void Radar_Setup () {
+int three (char* num) {
+    return
+        (num[0] - '0') * 100 +
+        (num[1] - '0') *  10 +
+        (num[2] - '0') *   1;
+}
+
+bool check_num (char c) {
+    return (c>='0' && c<='9');
+}
+
+bool check (Radar_S* s) {
+    return
+        (s->peak_dir=='A' || s->peak_dir=='C') &&
+        check_num(s->peak_val[0]) &&
+        check_num(s->peak_val[1]) &&
+        check_num(s->peak_val[2]) &&
+        check_num(s->peak_val[3]) &&
+        (s->live_dir=='A' || s->live_dir=='C') &&
+        check_num(s->live_val[0]) &&
+        check_num(s->live_val[1]) &&
+        check_num(s->live_val[2]) &&
+        check_num(s->live_val[3]) &&
+        check_num(s->size[0]) &&
+        check_num(s->size[1]) &&
+        check_num(s->size[2]) &&
+        check_num(s->ratio[0]) &&
+        check_num(s->ratio[1]) &&
+        check_num(s->ratio[2]) &&
+        s->status == 0x40 &&
+        s->cr == '\r';
+}
+
+void show (Radar_S* s) {
+    {
+        Serial.print(s->peak_dir);
+        Serial.print("=");
+        Serial.print(s->peak_val[1]);
+        Serial.print(s->peak_val[2]);
+        Serial.print('.');
+        Serial.print(s->peak_val[3]);
+    }
+    Serial.print(" / ");
+    {
+        Serial.print(s->live_dir);
+        Serial.print("=");
+        Serial.print(s->live_val[1]);
+        Serial.print(s->live_val[2]);
+        Serial.print('.');
+        Serial.print(s->live_val[3]);
+    }
+    Serial.print(" / siz=");
+    Serial.print(s->size[0]); Serial.print(s->size[1]); Serial.print(s->size[2]);
+    Serial.print(" / rat=");
+    Serial.print(s->ratio[0]); Serial.print(s->ratio[1]); Serial.print(s->ratio[2]);
+    Serial.println();
+}
+
+void radar_setup (void) {
     Serial1.begin(9600);
 }
 
-void Radar_Flush () {
-    while (Serial1.available()) {
-        Serial1.read();
-    }
-}
+int radar_read (Radar_S* s) {
+    static u32  onow = millis();
+    static char odir = '\0';
 
-int Radar () {
-#if 0
-    static u32 old = millis();
-    u32 now = millis();
-    u32 dt = now - old;
-    if (dt > 500) {
-        old = now;
-        if (random(0,5) <= 2) {
-            int vel = random(50,100);
-            return (random(0,2)==0) ? vel : -vel;
+    while (1) {
+        int n = Serial1.read();
+        if (n == 0x83) {
+            break;              // espera o primeiro byte do pacote
         }
     }
-    return 0;
-#else
-    static char dir = '\0';
-    static u32  old = millis();
-
-    if (!Serial1.available()) {
-        return 0;
+    while (1) {
+        int n = Serial1.available();
+        if (n >= sizeof(Radar_S)) {
+            break;              // espera ter o tamanho do pacote
+        }
     }
 
-    Radar_S s;
-    Serial1.readBytes((char*)&s, sizeof(Radar_S));
+    Serial1.readBytes((char*)s, sizeof(Radar_S));
 
-    int vel = tovel(&s);
+    char dir   = s->peak_dir;
+    int  vel   = four(s->peak_val);
+    int  size  = three(s->size);
+    int  ratio = three(s->ratio);
+
+    // ignora golpes consecutivos na mesma direcao em menos de 500ms
     u32 now = millis();
-    u32 dt = now - old;
-    if (s.dir==dir && dt<MIN_DT) {
+    u32 dt = now - onow;
+    if (dir==odir && dt<DT_500) {
         return 0;
     }
 
-    old = now;
-    dir = s.dir;
-    vel = (vel + 5) / 10;   // round
+    if (
+        (!check(s))                     ||  // erro no pacote
+        (vel!=0 && (size<3 || size>5))  ||  // tamanho incompativel
+        (s->peak_dir != s->live_dir)    ||  // direcoes incompativeis
+        (dir=='A' && ratio<25)          ||  // ratio muito baixo
+        false
+    ) {
+        return radar_read(s);               // tenta novamente
+    }
+
+    if (vel != 0) {
+        onow = now;
+        odir = dir;
+    }
     return (dir == 'A') ? vel : -vel;
-#endif
 }
