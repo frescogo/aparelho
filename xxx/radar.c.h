@@ -100,8 +100,8 @@ int radar_read (Radar_S* s) {
 
     Serial1.readBytes((char*)s, sizeof(Radar_S));
 
-    char dir   = s->peak_dir;
-    int  vel   = four(s->peak_val);
+    char dir   = s->live_dir;       // live nunca se perde,
+    int  vel   = four(s->live_val); // mesmo com pico em direcao oposta
     int  size  = three(s->size);
     int  ratio = three(s->ratio);
 
@@ -115,8 +115,8 @@ int radar_read (Radar_S* s) {
     if (
         (!check(s))                     ||  // erro no pacote
         (vel!=0 && (size<3 || size>5))  ||  // tamanho incompativel
-        (s->peak_dir != s->live_dir)    ||  // direcoes incompativeis
-        (dir=='A' && ratio<25)          ||  // ratio muito baixo
+        //(s->peak_dir != s->live_dir)    ||  // direcoes incompativeis
+        //(ratio < 15)                    ||  // ratio muito baixo
         false
     ) {
         return radar_read(s);               // tenta novamente
