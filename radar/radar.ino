@@ -1,4 +1,4 @@
-#define MIN_DT  500
+#define MIN_DT  100
 
 typedef char s8;
 typedef unsigned long u32;
@@ -54,10 +54,21 @@ void setup (void) {
 }
 
 void loop (void) {
+    static int old = 0;
     int vel = Radar();
+#if 1
     if (vel != 0) {
-        Serial.print((vel > 0) ? "->" : "<-");
-        //Serial.print(' ');
+        Serial.print((vel > 0) ? "<-" : "->");
+        Serial.print(' ');
         Serial.println(abs(vel));
     }
+#else
+    if (vel < 0) {
+        Serial.print(-vel);
+        Serial.print("  <--->  ");
+        Serial.println(old);
+    } else if (vel>0 && vel>old) {
+        old = vel;
+    }
+#endif
 }
